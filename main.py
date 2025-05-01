@@ -16,6 +16,7 @@ from src.backends.imageio import decodeWithImageioFFMPEG
 from src.backends.opencv import decodeWithOpenCV
 from src.backends.pyav import decodeWithPyAV
 from src.backends.torchaudio import decodeWithTorchaudio
+from src.backends.ffmpegcv import decodeWithFFMPEGCV_Block, decodeWithFFMPEGCV_NoBlock
 
 
 def downloadVideo(url: str, outputPath: str) -> str:
@@ -92,6 +93,15 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
 
     print("\nRunning torchaudio decoder...")
     decoders["torchaudio"] = decodeWithTorchaudio(videoPath)
+    time.sleep(coolingPeriod)
+
+    print("\nRunning FFMPEGCV (Block) decoder...")
+    decoders["ffmpegcvBlock"] = decodeWithFFMPEGCV_Block(videoPath)
+    time.sleep(coolingPeriod)
+
+    print("\nRunning FFMPEGCV (No Block) decoder...")
+    decoders["ffmpegcvNoBlock"] = decodeWithFFMPEGCV_NoBlock(videoPath)
+    time.sleep(coolingPeriod)
 
     print("\nBenchmark completed.")
 
