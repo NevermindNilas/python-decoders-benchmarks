@@ -17,7 +17,7 @@ This project benchmarks the performance (Frames Per Second - FPS) of various Pyt
     *   FFmpeg (via `subprocess`, testing both RGB and YUV raw output)
     *   imageio-ffmpeg
     *   ffmpegcv (with block and no-block)
-    *   decord
+    *   decord ( not recommended due to OOM issues )
     *   torchaudio ( requires FFMPEG v6, I can't test it. )
 
 ## Benchmark Results Example
