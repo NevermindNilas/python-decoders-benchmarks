@@ -16,50 +16,55 @@
         },
         "ram": {
             "totalGB": 31.76,
-            "availableGB": 19.24
+            "availableGB": 18.24
         }
     },
     "decoders": {
-        "pyav": {
+        "PyAV": {
             "frameCount": 15691,
-            "elapsedTime": 22.121952772140503,
-            "fps": 709.2954298212143
+            "elapsedTime": 22.072680711746216,
+            "fps": 710.8787647913497
         },
-        "opencv": {
+        "OpenCV": {
             "frameCount": 15691,
-            "elapsedTime": 18.10294771194458,
-            "fps": 866.7649186020052
+            "elapsedTime": 18.48120951652527,
+            "fps": 849.0245179012576
         },
-        "ffmpegRgb": {
+        "FFmpeg-rgb24": {
             "frameCount": 15691,
-            "elapsedTime": 15.456705093383789,
-            "fps": 1015.1581404445958
+            "elapsedTime": 15.54512643814087,
+            "fps": 1009.3838774769449
         },
-        "ffmpegYuv": {
+        "FFmpeg-yuv420p": {
             "frameCount": 15691,
-            "elapsedTime": 18.763471603393555,
-            "fps": 836.2524980271844
+            "elapsedTime": 19.09562849998474,
+            "fps": 821.7063921207169
         },
-        "imageio": {
+        "imageio-ffmpeg": {
             "frameCount": 15692,
-            "elapsedTime": 15.730109691619873,
-            "fps": 997.577277440082
+            "elapsedTime": 15.543076276779175,
+            "fps": 1009.5813544609127
         },
-        "torchaudio": {
+        "TorchAudio": {
             "error": "Failed to intialize FFmpeg extension. Tried versions: ['6', '5', '4', '']. Enable DEBUG logging to see more details about the error.",
             "frameCount": 0,
             "elapsedTime": 0,
             "fps": 0
         },
-        "ffmpegcvBlock": {
+        "ffmpegcv-Block": {
             "frameCount": 15691,
-            "elapsedTime": 15.642210960388184,
-            "fps": 1003.1190628828219
+            "elapsedTime": 15.705740690231323,
+            "fps": 999.0614457145283
         },
-        "ffmpegcvNoBlock": {
+        "ffmpegcv-NoBlock": {
             "frameCount": 15691,
-            "elapsedTime": 19.111997365951538,
-            "fps": 821.0026246630756
+            "elapsedTime": 19.193241119384766,
+            "fps": 817.5273734331626
+        },
+        "Decord-NOT-RECOMMENDED!": {
+            "frameCount": 15691,
+            "elapsedTime": 12.028346300125122,
+            "fps": 1304.5018499206976
         }
     }
 }

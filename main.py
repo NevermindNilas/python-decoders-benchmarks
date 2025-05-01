@@ -17,6 +17,7 @@ from src.backends.opencv import decodeWithOpenCV
 from src.backends.pyav import decodeWithPyAV
 from src.backends.torchaudio import decodeWithTorchaudio
 from src.backends.ffmpegcv import decodeWithFFMPEGCV_Block, decodeWithFFMPEGCV_NoBlock
+from src.backends.decord import decodeWithDecord
 
 
 def downloadVideo(url: str, outputPath: str) -> str:
@@ -73,34 +74,38 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
     decoders = {}
 
     print("\nRunning PyAV decoder...")
-    decoders["pyav"] = decodeWithPyAV(videoPath)
+    decoders["PyAV"] = decodeWithPyAV(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nRunning OpenCV decoder...")
-    decoders["opencv"] = decodeWithOpenCV(videoPath)
+    decoders["OpenCV"] = decodeWithOpenCV(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nRunning FFMPEG RGB decoder...")
-    decoders["ffmpegRgb"] = decodeWithFFMPEG_RGB24(videoPath, videoInfo)
+    decoders["FFmpeg-rgb24"] = decodeWithFFMPEG_RGB24(videoPath, videoInfo)
     time.sleep(coolingPeriod)
 
     print("\nRunning FFMPEG YUV decoder...")
-    decoders["ffmpegYuv"] = decodeWithFFMPEG_YUV420(videoPath, videoInfo)
+    decoders["FFmpeg-yuv420p"] = decodeWithFFMPEG_YUV420(videoPath, videoInfo)
     time.sleep(coolingPeriod)
 
     print("\nRunning imageio-ffmpeg decoder...")
-    decoders["imageio"] = decodeWithImageioFFMPEG(videoPath)
+    decoders["Imageio-ffmpeg"] = decodeWithImageioFFMPEG(videoPath)
 
     print("\nRunning torchaudio decoder...")
-    decoders["torchaudio"] = decodeWithTorchaudio(videoPath)
+    decoders["TorchAudio"] = decodeWithTorchaudio(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nRunning FFMPEGCV (Block) decoder...")
-    decoders["ffmpegcvBlock"] = decodeWithFFMPEGCV_Block(videoPath)
+    decoders["FFmpegCV-Block"] = decodeWithFFMPEGCV_Block(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nRunning FFMPEGCV (No Block) decoder...")
-    decoders["ffmpegcvNoBlock"] = decodeWithFFMPEGCV_NoBlock(videoPath)
+    decoders["FFmpegCV-NoBlock"] = decodeWithFFMPEGCV_NoBlock(videoPath)
+    time.sleep(coolingPeriod)
+
+    print("\nRunning Decord decoder...")
+    decoders["Decord-NOT-RECOMMENDED!"] = decodeWithDecord(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nBenchmark completed.")
@@ -179,9 +184,17 @@ def createPerformanceDiagram(results: Dict[str, Any], outputPath: str) -> None:
         bars = plt.bar(
             decoderNames,
             fpsValues,
-            color=["#3498db", "#2ecc71", "#e74c3c", "#f39c12", "#9b59b6"][
-                : len(decoderNames)
-            ],
+            color=[
+                "#3498db",
+                "#2ecc71",
+                "#e74c3c",
+                "#f39c12",
+                "#9b59b6",
+                "#1abc9c",
+                "#34495e",
+                "#f1c40f",
+                "#e67e22",
+            ][: len(decoderNames)],
         )
 
         for bar in bars:
