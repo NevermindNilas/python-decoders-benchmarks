@@ -1,0 +1,49 @@
+{
+    "videoPath": "videos\\sample_1080p.mp4",
+    "videoInfo": {
+        "width": 1280,
+        "height": 720,
+        "frameCount": 15691,
+        "fps": 24.0,
+        "durationSeconds": 653.7916666666666
+    },
+    "systemInfo": {
+        "cpu": {
+            "model": "Intel64 Family 6 Model 183 Stepping 1, GenuineIntel",
+            "physicalCores": 16,
+            "logicalCores": 24,
+            "frequencyMHz": 3400.0
+        },
+        "ram": {
+            "totalGB": 31.76,
+            "availableGB": 20.73
+        }
+    },
+    "decoders": {
+        "pyav": {
+            "frameCount": 15691,
+            "elapsedTime": 22.5385799407959,
+            "fps": 696.1840560149287
+        },
+        "opencv": {
+            "frameCount": 15691,
+            "elapsedTime": 18.07323694229126,
+            "fps": 868.1898018657167
+        },
+        "ffmpegRgb": {
+            "frameCount": 15691,
+            "elapsedTime": 15.674756050109863,
+            "fps": 1001.0363127718356
+        },
+        "ffmpegYuv": {
+            "frameCount": 15691,
+            "elapsedTime": 18.87573504447937,
+            "fps": 831.278885989088
+        },
+        "imageio": {
+            "frameCount": 15692,
+            "elapsedTime": 15.749947309494019,
+            "fps": 996.3207934378873
+        }
+    }
+}
