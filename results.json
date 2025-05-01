@@ -16,34 +16,40 @@
         },
         "ram": {
             "totalGB": 31.76,
-            "availableGB": 20.73
+            "availableGB": 18.75
         }
     },
     "decoders": {
         "pyav": {
             "frameCount": 15691,
-            "elapsedTime": 22.5385799407959,
-            "fps": 696.1840560149287
+            "elapsedTime": 21.625086784362793,
+            "fps": 725.5924638113471
         },
         "opencv": {
             "frameCount": 15691,
-            "elapsedTime": 18.07323694229126,
-            "fps": 868.1898018657167
+            "elapsedTime": 18.335514783859253,
+            "fps": 855.7709006246599
         },
         "ffmpegRgb": {
             "frameCount": 15691,
-            "elapsedTime": 15.674756050109863,
-            "fps": 1001.0363127718356
+            "elapsedTime": 15.58626103401184,
+            "fps": 1006.7199545650878
         },
         "ffmpegYuv": {
             "frameCount": 15691,
-            "elapsedTime": 18.87573504447937,
-            "fps": 831.278885989088
+            "elapsedTime": 17.999486923217773,
+            "fps": 871.7470707323315
         },
         "imageio": {
             "frameCount": 15692,
-            "elapsedTime": 15.749947309494019,
-            "fps": 996.3207934378873
+            "elapsedTime": 15.974053621292114,
+            "fps": 982.3430152434095
+        },
+        "torchaudio": {
+            "error": "Failed to intialize FFmpeg extension. Tried versions: ['6', '5', '4', '']. Enable DEBUG logging to see more details about the error.",
+            "frameCount": 0,
+            "elapsedTime": 0,
+            "fps": 0
         }
     }
 }
