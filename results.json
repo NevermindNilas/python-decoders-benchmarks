@@ -16,34 +16,34 @@
         },
         "ram": {
             "totalGB": 31.76,
-            "availableGB": 18.24
+            "availableGB": 18.31
         }
     },
     "decoders": {
         "PyAV": {
             "frameCount": 15691,
-            "elapsedTime": 22.072680711746216,
-            "fps": 710.8787647913497
+            "elapsedTime": 21.999624967575073,
+            "fps": 713.2394312687937
         },
         "OpenCV": {
             "frameCount": 15691,
-            "elapsedTime": 18.48120951652527,
-            "fps": 849.0245179012576
+            "elapsedTime": 19.097911834716797,
+            "fps": 821.6081494038734
         },
         "FFmpeg-rgb24": {
             "frameCount": 15691,
-            "elapsedTime": 15.54512643814087,
-            "fps": 1009.3838774769449
+            "elapsedTime": 15.692299365997314,
+            "fps": 999.9171972209421
         },
         "FFmpeg-yuv420p": {
             "frameCount": 15691,
-            "elapsedTime": 19.09562849998474,
-            "fps": 821.7063921207169
+            "elapsedTime": 18.31081461906433,
+            "fps": 856.9252830326452
         },
-        "imageio-ffmpeg": {
+        "Imageio-ffmpeg": {
             "frameCount": 15692,
-            "elapsedTime": 15.543076276779175,
-            "fps": 1009.5813544609127
+            "elapsedTime": 15.670337200164795,
+            "fps": 1001.3824080208674
         },
         "TorchAudio": {
             "error": "Failed to intialize FFmpeg extension. Tried versions: ['6', '5', '4', '']. Enable DEBUG logging to see more details about the error.",
@@ -51,20 +51,20 @@
             "elapsedTime": 0,
             "fps": 0
         },
-        "ffmpegcv-Block": {
+        "FFmpegCV-Block": {
             "frameCount": 15691,
-            "elapsedTime": 15.705740690231323,
-            "fps": 999.0614457145283
+            "elapsedTime": 15.874759197235107,
+            "fps": 988.4244419110865
         },
-        "ffmpegcv-NoBlock": {
+        "FFmpegCV-NoBlock": {
             "frameCount": 15691,
-            "elapsedTime": 19.193241119384766,
-            "fps": 817.5273734331626
+            "elapsedTime": 19.359604835510254,
+            "fps": 810.5020806632822
         },
-        "Decord-NOT-RECOMMENDED!": {
+        "Decord": {
             "frameCount": 15691,
-            "elapsedTime": 12.028346300125122,
-            "fps": 1304.5018499206976
+            "elapsedTime": 12.028707265853882,
+            "fps": 1304.462703531105
         }
     }
 }

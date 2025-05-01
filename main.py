@@ -105,7 +105,7 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
     time.sleep(coolingPeriod)
 
     print("\nRunning Decord decoder...")
-    decoders["Decord-NOT-RECOMMENDED!"] = decodeWithDecord(videoPath)
+    decoders["Decord"] = decodeWithDecord(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nBenchmark completed.")
@@ -184,6 +184,7 @@ def createPerformanceDiagram(results: Dict[str, Any], outputPath: str) -> None:
         bars = plt.bar(
             decoderNames,
             fpsValues,
+            width=0.7,
             color=[
                 "#3498db",
                 "#2ecc71",
@@ -209,9 +210,9 @@ def createPerformanceDiagram(results: Dict[str, Any], outputPath: str) -> None:
                 fontweight="bold",
             )
 
-        plt.xlabel("Decoder", fontsize=12)
+        plt.xlabel("Decoders", fontsize=12)
         plt.ylabel("Performance (FPS)", fontsize=12)
-        plt.title("Video Decoder Performance Comparison", fontsize=16)
+        plt.title("Video Decoders Performance Comparison", fontsize=16)
         plt.ylim(0, max(fpsValues) * 1.1)
 
         if "systemInfo" in results and "error" not in results["systemInfo"]:
