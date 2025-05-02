@@ -1,5 +1,5 @@
 {
-    "videoPath": "videos\\sample_1080p.mp4",
+    "videoPath": "videos\\sample_720p.mp4",
     "videoInfo": {
         "width": 1280,
         "height": 720,
@@ -16,34 +16,29 @@
         },
         "ram": {
             "totalGB": 31.76,
-            "availableGB": 18.31
+            "availableGB": 19.57
         }
     },
     "decoders": {
         "PyAV": {
             "frameCount": 15691,
-            "elapsedTime": 21.999624967575073,
-            "fps": 713.2394312687937
+            "elapsedTime": 22.286634922027588,
+            "fps": 704.0542484272214
         },
         "OpenCV": {
             "frameCount": 15691,
-            "elapsedTime": 19.097911834716797,
-            "fps": 821.6081494038734
+            "elapsedTime": 24.020938634872437,
+            "fps": 653.2217678296953
         },
         "FFmpeg-rgb24": {
             "frameCount": 15691,
-            "elapsedTime": 15.692299365997314,
-            "fps": 999.9171972209421
-        },
-        "FFmpeg-yuv420p": {
-            "frameCount": 15691,
-            "elapsedTime": 18.31081461906433,
-            "fps": 856.9252830326452
+            "elapsedTime": 16.004206895828247,
+            "fps": 980.429714645223
         },
         "Imageio-ffmpeg": {
             "frameCount": 15692,
-            "elapsedTime": 15.670337200164795,
-            "fps": 1001.3824080208674
+            "elapsedTime": 15.974520444869995,
+            "fps": 982.3143082232103
         },
         "TorchAudio": {
             "error": "Failed to intialize FFmpeg extension. Tried versions: ['6', '5', '4', '']. Enable DEBUG logging to see more details about the error.",
@@ -53,18 +48,23 @@
         },
         "FFmpegCV-Block": {
             "frameCount": 15691,
-            "elapsedTime": 15.874759197235107,
-            "fps": 988.4244419110865
+            "elapsedTime": 15.980184078216553,
+            "fps": 981.9035827872124
         },
         "FFmpegCV-NoBlock": {
             "frameCount": 15691,
-            "elapsedTime": 19.359604835510254,
-            "fps": 810.5020806632822
+            "elapsedTime": 20.080337047576904,
+            "fps": 781.4111866161845
         },
         "Decord": {
             "frameCount": 15691,
-            "elapsedTime": 12.028707265853882,
-            "fps": 1304.462703531105
+            "elapsedTime": 12.119482040405273,
+            "fps": 1294.6922935887528
+        },
+        "Deffcode": {
+            "frameCount": 15691,
+            "elapsedTime": 15.780584335327148,
+            "fps": 994.3231293960008
         }
     }
 }

@@ -5,6 +5,8 @@
 
 A place where one can get guidance on which Python video decoder is best suited for their project based on performance benchmarks.
 
+All benchmarks standardize on `numpy` arrays in RGB24 format as the final output. Performance measurements include any necessary color space conversions (e.g., BGR→RGB for OpenCV) to ensure fair comparison across all libraries.
+
 ## Overview
 
 This project benchmarks the performance (Frames Per Second - FPS) of various Python libraries used for video decoding. The goal is to provide developers with data to make informed decisions when choosing a video decoding backend for their applications.

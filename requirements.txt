@@ -8,3 +8,4 @@ imageio-ffmpeg
 torchaudio
 decord
 ffmpegcv
+deffcode

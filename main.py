@@ -11,13 +11,14 @@ import cv2
 import psutil
 import matplotlib.pyplot as plt
 
-from src.backends.ffmpeg import decodeWithFFMPEG_RGB24, decodeWithFFMPEG_YUV420
+from src.backends.ffmpeg import decodeWithFFMPEG_RGB24
 from src.backends.imageio import decodeWithImageioFFMPEG
 from src.backends.opencv import decodeWithOpenCV
 from src.backends.pyav import decodeWithPyAV
 from src.backends.torchaudio import decodeWithTorchaudio
 from src.backends.ffmpegcv import decodeWithFFMPEGCV_Block, decodeWithFFMPEGCV_NoBlock
 from src.backends.decord import decodeWithDecord
+from src.backends.deffcode import decodeWithDeffcode
 
 
 def downloadVideo(url: str, outputPath: str) -> str:
@@ -67,7 +68,7 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
         videoPath: Path to the video file to benchmark
         coolingPeriod: Time in seconds to wait between decoder tests
     """
-    print("\nGetting video information...")
+    print("Getting video information...")
     videoInfo = getVideoInfo(videoPath)
     systemInfo = getSystemInfo()
 
@@ -83,10 +84,6 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
 
     print("\nRunning FFMPEG RGB decoder...")
     decoders["FFmpeg-rgb24"] = decodeWithFFMPEG_RGB24(videoPath, videoInfo)
-    time.sleep(coolingPeriod)
-
-    print("\nRunning FFMPEG YUV decoder...")
-    decoders["FFmpeg-yuv420p"] = decodeWithFFMPEG_YUV420(videoPath, videoInfo)
     time.sleep(coolingPeriod)
 
     print("\nRunning imageio-ffmpeg decoder...")
@@ -106,6 +103,10 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
 
     print("\nRunning Decord decoder...")
     decoders["Decord"] = decodeWithDecord(videoPath)
+    time.sleep(coolingPeriod)
+
+    print("\nRunning Deffcode decoder...")
+    decoders["Deffcode"] = decodeWithDeffcode(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nBenchmark completed.")
@@ -180,11 +181,11 @@ def createPerformanceDiagram(results: Dict[str, Any], outputPath: str) -> None:
             print("No valid decoder results to plot.")
             return
 
-        plt.figure(figsize=(12, 7))
+        plt.figure(figsize=(14, 8))
         bars = plt.bar(
             decoderNames,
             fpsValues,
-            width=0.7,
+            width=0.5,
             color=[
                 "#3498db",
                 "#2ecc71",
@@ -208,12 +209,15 @@ def createPerformanceDiagram(results: Dict[str, Any], outputPath: str) -> None:
                 ha="center",
                 va="bottom",
                 fontweight="bold",
+                fontsize=10,
             )
 
         plt.xlabel("Decoders", fontsize=12)
         plt.ylabel("Performance (FPS)", fontsize=12)
         plt.title("Video Decoders Performance Comparison", fontsize=16)
         plt.ylim(0, max(fpsValues) * 1.1)
+
+        plt.xticks(rotation=45, ha="right")
 
         if "systemInfo" in results and "error" not in results["systemInfo"]:
             systemInfo = results["systemInfo"]
@@ -236,7 +240,7 @@ def createPerformanceDiagram(results: Dict[str, Any], outputPath: str) -> None:
 
         plt.grid(axis="y", linestyle="--", alpha=0.7)
 
-        plt.tight_layout(rect=[0.01, 0.01, 0.99, 0.99])
+        plt.tight_layout(rect=[0.02, 0.05, 0.98, 0.95])
         plt.savefig(outputPath, dpi=300)
         print(f"Performance diagram saved to {outputPath}")
 
