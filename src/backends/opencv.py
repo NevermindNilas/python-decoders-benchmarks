@@ -16,6 +16,7 @@ def decodeWithOpenCV(videoPath: str) -> Dict[str, Any]:
             ret, frame = cap.read()
             if not ret:
                 break
+            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
             frameCount += 1
 
         cap.release()
