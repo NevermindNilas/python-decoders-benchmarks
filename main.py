@@ -19,6 +19,7 @@ from src.backends.torchaudio import decodeWithTorchaudio
 from src.backends.ffmpegcv import decodeWithFFMPEGCV_Block, decodeWithFFMPEGCV_NoBlock
 from src.backends.decord import decodeWithDecord
 from src.backends.deffcode import decodeWithDeffcode
+from src.backends.maxTheoretical import decodeWithMaxTheoretical
 
 
 def downloadVideo(url: str, outputPath: str) -> str:
@@ -107,6 +108,10 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
 
     print("\nRunning Deffcode decoder...")
     decoders["Deffcode"] = decodeWithDeffcode(videoPath)
+    time.sleep(coolingPeriod)
+
+    print("\nRunning Max Theoretical decoder...")
+    decoders["Max Theoretical"] = decodeWithMaxTheoretical(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nBenchmark completed.")
