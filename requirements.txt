@@ -1,4 +1,3 @@
-moviepy
 opencv-python
 numpy
 pillow

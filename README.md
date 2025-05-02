@@ -12,13 +12,13 @@ This project benchmarks the performance (Frames Per Second - FPS) of various Pyt
 ## Features
 
 *   Benchmarks multiple popular Python video decoding libraries:
-    *   PyAV
-    *   OpenCV
-    *   FFmpeg (via `subprocess`, testing both RGB and YUV raw output)
-    *   imageio-ffmpeg
-    *   ffmpegcv (with block and no-block)
-    *   decord ( not recommended due to OOM issues )
-    *   torchaudio ( requires FFMPEG v6, I can't test it. )
+    *   [PyAV](https://pyav.org/)
+    *   [OpenCV](https://opencv.org/) (via `opencv-python`)
+    *   [FFmpeg](https://ffmpeg.org/) (via `subprocess`, testing both RGB and YUV raw output)
+    *   [imageio-ffmpeg](https://github.com/imageio/imageio-ffmpeg)
+    *   [ffmpegcv](https://github.com/chenxinfeng4/ffmpegcv) (with block and no-block)
+    *   [decord](https://github.com/dmlc/decord) ( not recommended due to OOM issues )
+    *   [torchaudio](https://pytorch.org/audio/stable/index.html) ( requires FFMPEG v6, I can't test it. )
 
 ## Benchmark Results Example
 
