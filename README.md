@@ -16,7 +16,7 @@ This project benchmarks the performance (Frames Per Second - FPS) of various Pyt
 *   Benchmarks multiple popular Python video decoding libraries:
     *   [PyAV](https://pyav.org/)
     *   [OpenCV](https://opencv.org/) (via `opencv-python`)
-    *   [FFmpeg](https://ffmpeg.org/) (via `subprocess`, testing both RGB and YUV raw output)
+    *   [FFmpeg](https://ffmpeg.org/) (via `subprocess`)
     *   [ImageIO-FFmpeg](https://github.com/imageio/imageio-ffmpeg)
     *   [FFmpegCV](https://github.com/chenxinfeng4/ffmpegcv) (with block and no-block)
     *   [Decord](https://github.com/dmlc/decord) ( not recommended due to [OOM Issues](https://github.com/dmlc/decord/issues/323))
