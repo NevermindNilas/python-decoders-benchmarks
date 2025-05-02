@@ -297,7 +297,7 @@ def main() -> None:
     """Main function to run the benchmark."""
     videoUrl = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
     videoDir = "videos"
-    videoFilename = "sample_1080p.mp4"
+    videoFilename = "sample_720p.mp4"
     videoPath = os.path.join(videoDir, videoFilename)
     resultsPath = "results.json"
     diagramPath = "decoder_performance.png"
