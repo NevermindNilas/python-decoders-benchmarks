@@ -58,3 +58,8 @@ Contributions are welcome! If you want to add another decoder, improve the bench
 ## License
 
 This project is licensed under the BSD 3-Clause License - see the [LICENSE](LICENSE) file for details.
+
+## Plans
+- Add 480p / 1080p benchmarks
+- Add Torchcodec
+- Add a tracker to the GH Runner that keeps track of changes from week to week logging whether the performance of any library has improved or decreased.
