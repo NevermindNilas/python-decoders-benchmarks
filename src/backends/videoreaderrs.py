@@ -28,12 +28,15 @@ def decodeWithVideoReaderRS(videoPath: str) -> Dict[str, Any]:
         chunkSize = 800
         videoLenght = reader.get_shape()[0]
 
+        frameCount = 0
         for i in range(0, videoLenght, chunkSize):
             end = min(i + chunkSize, videoLenght)
             frames = reader.decode(
                 start_frame=i,
                 end_frame=end,
             )
+            frameCount += chunkSize
+
         endTime = time.time()
         elapsedTime = endTime - startTime
 
