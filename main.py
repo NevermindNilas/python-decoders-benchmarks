@@ -88,27 +88,27 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
     decoders["OpenCV"] = decodeWithOpenCV(videoPath)
     time.sleep(coolingPeriod)
 
-    print("\nRunning FFMPEG RGB decoder...")
-    decoders["FFmpeg-rgb24"] = decodeWithFFMPEG_RGB24(videoPath, videoInfo)
-    time.sleep(coolingPeriod)
-
-    print("\nRunning imageio-ffmpeg decoder...")
-    decoders["Imageio-ffmpeg"] = decodeWithImageioFFMPEG(videoPath)
-
     print("\nRunning torchaudio decoder...")
     decoders["TorchAudio"] = decodeWithTorchaudio(videoPath)
+    time.sleep(coolingPeriod)
+
+    print("\nRunning Decord decoder...")
+    decoders["Decord"] = decodeWithDecord(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nRunning FFMPEGCV (Block) decoder...")
     decoders["FFmpegCV-Block"] = decodeWithFFMPEGCV_Block(videoPath)
     time.sleep(coolingPeriod)
 
-    print("\nRunning FFMPEGCV (No Block) decoder...")
-    decoders["FFmpegCV-NoBlock"] = decodeWithFFMPEGCV_NoBlock(videoPath)
+    print("\nRunning FFMPEG RGB decoder...")
+    decoders["FFmpeg-Subprocess"] = decodeWithFFMPEG_RGB24(videoPath, videoInfo)
     time.sleep(coolingPeriod)
 
-    print("\nRunning Decord decoder...")
-    decoders["Decord"] = decodeWithDecord(videoPath)
+    print("\nRunning imageio-ffmpeg decoder...")
+    decoders["Imageio-ffmpeg"] = decodeWithImageioFFMPEG(videoPath)
+
+    print("\nRunning FFMPEGCV (No Block) decoder...")
+    decoders["FFmpegCV-NoBlock"] = decodeWithFFMPEGCV_NoBlock(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nRunning Deffcode decoder...")
