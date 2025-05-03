@@ -23,6 +23,7 @@ This project benchmarks the performance (Frames Per Second - FPS) of various Pyt
     *   [TorchAudio](https://pytorch.org/audio/stable/index.html) ( requires FFMPEG v6, I can't test it. )
     *   [DeffCode](https://abhitronix.github.io/deffcode/latest/)
     *   [BasswoodAV](https://av.basswood-io.com/docs/stable/) ( pyav continutation )
+    *   [Video-Reader-RS](https://github.com/gcanat/video_reader-rs)(Doesn't currently [work on Windows](https://github.com/gcanat/video_reader-rs/issues/52) and the documentation is iffy, take with a grain of salt.)
 
 ## Benchmark Results Example
 
@@ -64,7 +65,6 @@ Contributions are welcome! If you want to add another decoder, improve the bench
 This project is licensed under the BSD 3-Clause License - see the [LICENSE](LICENSE) file for details.
 
 ## Plans
-- Add https://github.com/NevermindNilas/python-decoders-benchmarks/issues/1
 - Add 480p / 1080p benchmarks
 - Add Torchcodec
 - Add a tracker to the GH Runner that keeps track of changes from week to week logging whether the performance of any library has improved or decreased.

@@ -1,0 +1,56 @@
+import time
+
+try:
+    from video_reader import PyVideoReader
+except ImportError:
+    print("PyVideoReader error: https://github.com/gcanat/video_reader-rs/issues/52")
+
+from typing import Dict, Any
+
+
+def decodeWithVideoReaderRS(videoPath: str) -> Dict[str, Any]:
+    """Decode video using PyVideoReader and return metrics."""
+    try:
+        print("Decoding with PyVideoReader...")
+        startTime = time.time()
+
+        reader = PyVideoReader(videoPath)
+        frameCount = 0
+
+        # This is from the offiical readme.md,
+        # It doesn't seem to natively support a simple frame iterator,
+        # May not be 100% accurate since the decode may happen async on rust side.
+        # And simply yield 800 frames at a time which can artifically improve performance.
+        # It should default to np rgb chw format. But take it with a grain of salt since it doesn't work on windows
+        # and I don't want to bother with WSL.
+
+        # Maybe using chunksize=1 would be more accurate, but potentially slower.
+        chunkSize = 800
+        videoLenght = reader.get_shape()[0]
+
+        for i in range(0, videoLenght, chunkSize):
+            end = min(i + chunkSize, videoLenght)
+            frames = reader.decode(
+                start_frame=i,
+                end_frame=end,
+            )
+        endTime = time.time()
+        elapsedTime = endTime - startTime
+
+        print(
+            f"PyVideoReader: Processed {frameCount} frames in {elapsedTime:.2f} seconds"
+        )
+
+        return {
+            "frameCount": frameCount,
+            "elapsedTime": elapsedTime,
+            "fps": frameCount / elapsedTime if elapsedTime > 0 else 0,
+        }
+    except Exception as e:
+        print(f"Error in PyVideoReader decoder: {str(e)}")
+        return {
+            "error": str(e),
+            "frameCount": 0,
+            "elapsedTime": 0,
+            "fps": 0,
+        }

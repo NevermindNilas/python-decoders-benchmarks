@@ -10,3 +10,4 @@ decord
 ffmpegcv
 deffcode
 basswood-av
+video-reader-rs

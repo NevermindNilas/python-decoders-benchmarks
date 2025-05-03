@@ -11,8 +11,12 @@ def decodeWithOpenCV(videoPath: str) -> Dict[str, Any]:
 
         cap = cv2.VideoCapture(videoPath)
         frameCount = 0
+        totalFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
-        while True:
+        # Switched to for loops for potentially better performance
+        # May not be as accurate as using while loop due to potentially skipping frames
+        # OpenCV cv2.CAP_PROP_FRAME_COUNT is not always accurate, hope that it works.
+        for _ in range(totalFrames):
             ret, frame = cap.read()
             if not ret:
                 break

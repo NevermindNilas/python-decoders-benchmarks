@@ -21,6 +21,7 @@ from src.backends.decord import decodeWithDecord
 from src.backends.deffcode import decodeWithDeffcode
 from src.backends.maxTheoretical import decodeWithMaxTheoretical
 from src.backends.basswoodav import decodeWithBasswoodAV
+from src.backends.videoreaderrs import decodeWithVideoReaderRS
 
 
 def downloadVideo(url: str, outputPath: str) -> str:
@@ -94,6 +95,10 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
 
     print("\nRunning Decord decoder...")
     decoders["Decord"] = decodeWithDecord(videoPath)
+    time.sleep(coolingPeriod)
+
+    print("\nRunning VideoReaderRS decoder...")
+    decoders["VideoReaderRS"] = decodeWithVideoReaderRS(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nRunning FFMPEGCV (Block) decoder...")
