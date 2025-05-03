@@ -24,6 +24,8 @@ This project benchmarks the performance (Frames Per Second - FPS) of various Pyt
     *   [DeffCode](https://abhitronix.github.io/deffcode/latest/)
     *   [BasswoodAV](https://av.basswood-io.com/docs/stable/) ( pyav continutation )
     *   [Video-Reader-RS](https://github.com/gcanat/video_reader-rs)(Doesn't currently [work on Windows](https://github.com/gcanat/video_reader-rs/issues/52) and the documentation is iffy, take with a grain of salt.)
+    *   **Max Theoretical**: Baseline performance using raw `ffmpeg` subprocess ([`decodeWithMaxTheoretical`](src/backends/maxTheoretical.py)) to estimate maximum hardware FPS with minimal overhead.
+
 
 ## Benchmark Results Example
 
