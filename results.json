@@ -16,60 +16,14 @@
         },
         "ram": {
             "totalGB": 31.76,
-            "availableGB": 19.19
+            "availableGB": 7.48
         }
     },
     "decoders": {
-        "PyAV": {
+        "BasswoodAV": {
             "frameCount": 15691,
-            "elapsedTime": 21.989285945892334,
-            "fps": 713.5747854027578
-        },
-        "OpenCV": {
-            "frameCount": 15691,
-            "elapsedTime": 23.79330039024353,
-            "fps": 659.4713529710284
-        },
-        "FFmpeg-rgb24": {
-            "frameCount": 15691,
-            "elapsedTime": 16.22059655189514,
-            "fps": 967.3503653086503
-        },
-        "Imageio-ffmpeg": {
-            "frameCount": 15692,
-            "elapsedTime": 15.907817840576172,
-            "fps": 986.4332215305053
-        },
-        "TorchAudio": {
-            "error": "Failed to intialize FFmpeg extension. Tried versions: ['6', '5', '4', '']. Enable DEBUG logging to see more details about the error.",
-            "frameCount": 0,
-            "elapsedTime": 0,
-            "fps": 0
-        },
-        "FFmpegCV-Block": {
-            "frameCount": 15691,
-            "elapsedTime": 15.917699575424194,
-            "fps": 985.7580189681302
-        },
-        "FFmpegCV-NoBlock": {
-            "frameCount": 15691,
-            "elapsedTime": 20.26572036743164,
-            "fps": 774.2631258850527
-        },
-        "Decord": {
-            "frameCount": 15691,
-            "elapsedTime": 12.092106103897095,
-            "fps": 1297.6234135874013
-        },
-        "Deffcode": {
-            "frameCount": 15691,
-            "elapsedTime": 15.739782571792603,
-            "fps": 996.9006832483171
-        },
-        "Max Theoretical": {
-            "frameCount": 15691,
-            "elapsedTime": 6.125173568725586,
-            "fps": 2561.723324889338
+            "elapsedTime": 23.980741024017334,
+            "fps": 654.3167279228385
         }
     }
 }

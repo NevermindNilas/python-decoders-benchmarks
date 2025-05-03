@@ -20,6 +20,7 @@ from src.backends.ffmpegcv import decodeWithFFMPEGCV_Block, decodeWithFFMPEGCV_N
 from src.backends.decord import decodeWithDecord
 from src.backends.deffcode import decodeWithDeffcode
 from src.backends.maxTheoretical import decodeWithMaxTheoretical
+from src.backends.basswoodav import decodeWithBasswoodAV
 
 
 def downloadVideo(url: str, outputPath: str) -> str:
@@ -112,6 +113,10 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
 
     print("\nRunning Max Theoretical decoder...")
     decoders["Max Theoretical"] = decodeWithMaxTheoretical(videoPath)
+    time.sleep(coolingPeriod)
+
+    print("\nRunning BasswoodAV decoder...")
+    decoders["BasswoodAV"] = decodeWithBasswoodAV(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nBenchmark completed.")
@@ -208,8 +213,7 @@ def createPerformanceDiagram(results: Dict[str, Any], outputPath: str) -> None:
             height = bar.get_height()
             plt.text(
                 bar.get_x() + bar.get_width() / 2.0,
-                height
-                + max(1, height * 0.02),  # Adjust offset slightly based on height
+                height + max(1, height * 0.02),
                 f"{height:.1f} fps",
                 ha="center",
                 va="bottom",

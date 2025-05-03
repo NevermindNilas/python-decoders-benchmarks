@@ -22,6 +22,7 @@ This project benchmarks the performance (Frames Per Second - FPS) of various Pyt
     *   [Decord](https://github.com/dmlc/decord) ( not recommended due to [OOM Issues](https://github.com/dmlc/decord/issues/323))
     *   [TorchAudio](https://pytorch.org/audio/stable/index.html) ( requires FFMPEG v6, I can't test it. )
     *   [DeffCode](https://abhitronix.github.io/deffcode/latest/)
+    *   [BasswoodAV](https://av.basswood-io.com/docs/stable/) ( pyav continutation )
 
 ## Benchmark Results Example
 
