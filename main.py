@@ -80,6 +80,10 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
     decoders["PyAV"] = decodeWithPyAV(videoPath)
     time.sleep(coolingPeriod)
 
+    print("\nRunning BasswoodAV decoder...")
+    decoders["BasswoodAV"] = decodeWithBasswoodAV(videoPath)
+    time.sleep(coolingPeriod)
+
     print("\nRunning OpenCV decoder...")
     decoders["OpenCV"] = decodeWithOpenCV(videoPath)
     time.sleep(coolingPeriod)
@@ -113,10 +117,6 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
 
     print("\nRunning Max Theoretical decoder...")
     decoders["Max Theoretical"] = decodeWithMaxTheoretical(videoPath)
-    time.sleep(coolingPeriod)
-
-    print("\nRunning BasswoodAV decoder...")
-    decoders["BasswoodAV"] = decodeWithBasswoodAV(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nBenchmark completed.")
