@@ -9,3 +9,4 @@ torchaudio
 decord
 ffmpegcv
 deffcode
+basswood-av
