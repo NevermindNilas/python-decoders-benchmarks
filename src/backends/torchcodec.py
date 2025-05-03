@@ -1,7 +1,11 @@
 import time
 import torch
-from torchcodec.decoders import VideoDecoder
 from typing import Dict, Any
+
+try:
+    from torchcodec.decoders import VideoDecoder
+except ImportError:
+    print("torchcodec error: Not supported on Windows yet.")
 
 
 def decodeWithTorchCodec(videoPath: str) -> Dict[str, Any]:

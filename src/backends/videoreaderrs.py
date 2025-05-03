@@ -9,9 +9,9 @@ from typing import Dict, Any
 
 
 def decodeWithVideoReaderRS(videoPath: str) -> Dict[str, Any]:
-    """Decode video using PyVideoReader and return metrics."""
+    """Decode video using VideoReaderRS and return metrics."""
     try:
-        print("Decoding with PyVideoReader...")
+        print("Decoding with VideoReaderRS...")
         startTime = time.time()
 
         reader = PyVideoReader(videoPath)
@@ -41,7 +41,7 @@ def decodeWithVideoReaderRS(videoPath: str) -> Dict[str, Any]:
         elapsedTime = endTime - startTime
 
         print(
-            f"PyVideoReader: Processed {frameCount} frames in {elapsedTime:.2f} seconds"
+            f"VideoReaderRS: Processed {frameCount} frames in {elapsedTime:.2f} seconds"
         )
 
         return {
@@ -50,7 +50,7 @@ def decodeWithVideoReaderRS(videoPath: str) -> Dict[str, Any]:
             "fps": frameCount / elapsedTime if elapsedTime > 0 else 0,
         }
     except Exception as e:
-        print(f"Error in PyVideoReader decoder: {str(e)}")
+        print(f"Error in VideoReaderRS decoder: {str(e)}")
         return {
             "error": str(e),
             "frameCount": 0,
