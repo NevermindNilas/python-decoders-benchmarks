@@ -22,6 +22,7 @@ from src.backends.deffcode import decodeWithDeffcode
 from src.backends.maxTheoretical import decodeWithMaxTheoretical
 from src.backends.basswoodav import decodeWithBasswoodAV
 from src.backends.videoreaderrs import decodeWithVideoReaderRS
+from src.backends.torchcodec import decodeWithTorchCodec
 
 
 def downloadVideo(url: str, outputPath: str) -> str:
@@ -91,6 +92,10 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> Dict[str, Any]:
 
     print("\nRunning torchaudio decoder...")
     decoders["TorchAudio"] = decodeWithTorchaudio(videoPath)
+    time.sleep(coolingPeriod)
+
+    print("\nRunning TorchCodec decoder...")
+    decoders["TorchCodec"] = decodeWithTorchCodec(videoPath)
     time.sleep(coolingPeriod)
 
     print("\nRunning Decord decoder...")

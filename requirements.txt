@@ -1,3 +1,4 @@
+torch
 opencv-python
 numpy
 pillow
@@ -11,3 +12,4 @@ ffmpegcv
 deffcode
 basswood-av
 video-reader-rs
+torchcodec
