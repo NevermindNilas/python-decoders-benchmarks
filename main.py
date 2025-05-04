@@ -29,6 +29,7 @@ from src.backends.videoreaderrs import (
     decodeWithVideoReaderRSFast,
 )
 from src.backends.torchcodec import decodeWithTorchCodec
+from src.backends.ffmpegpython import decodeWithFFmpegPython
 from src.coloredPrints import lightcyan
 
 
@@ -132,6 +133,12 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> dict[str, Any]:
             name="Imageio-ffmpeg",
             decoder=decodeWithImageioFFMPEG,
             cooling=coolingPeriod,
+        ),
+        Decoder(
+            name="FFmpeg-python",
+            decoder=decodeWithFFmpegPython,
+            cooling=coolingPeriod,
+            videoInfo=videoInfo,
         ),
         Decoder(name="Deffcode", decoder=decodeWithDeffcode, cooling=coolingPeriod),
         Decoder(

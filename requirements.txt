@@ -13,3 +13,4 @@ deffcode
 basswood-av
 video-reader-rs
 torchcodec
+ffmpeg-python
