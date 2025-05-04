@@ -38,12 +38,13 @@ def decodeWithFFMPEG_RGB24(videoPath: str, videoInfo) -> dict[str, Any]:
                 rawFrame = process.stdout.read(bytesPerFrame)
                 frameArray = np.frombuffer(rawFrame, dtype=np.uint8).reshape(
                     height, width, 3
-                )
-                frameArray = np.transpose(frameArray, (2, 0, 1))  # CHW format
+                )  # RGB format, H W C
                 processedFrames += 1
         except:
             if len(rawFrame) != 0 and len(rawFrame) != bytesPerFrame:
-                raise ValueError(f"Error: waiting for {bytesPerFrame} bytes, received {len(rawFrame)} bytes")
+                raise ValueError(
+                    f"Error: waiting for {bytesPerFrame} bytes, received {len(rawFrame)} bytes"
+                )
 
         endTime = time.time()
         elapsedTime = endTime - startTime
