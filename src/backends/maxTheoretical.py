@@ -12,6 +12,14 @@ def decodeWithMaxTheoretical(videoPath: str) -> dict[str, Any]:
     """
     try:
         print("Measuring theoretical maximum decoding speed...")
+        frameCount = 0
+        try:
+            cap = cv2.VideoCapture(videoPath)
+            frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+            cap.release()
+        except Exception as e:
+            print(f"Warning: Failed to get frame count with OpenCV: {str(e)}")
+
         startTime = time.time()
 
         cmd = [
@@ -34,14 +42,6 @@ def decodeWithMaxTheoretical(videoPath: str) -> dict[str, Any]:
 
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         _, stderr = process.communicate()
-
-        frameCount = 0
-        try:
-            cap = cv2.VideoCapture(videoPath)
-            frameCount = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-            cap.release()
-        except Exception as e:
-            print(f"Warning: Failed to get frame count with OpenCV: {str(e)}")
 
         endTime = time.time()
         elapsedTime = endTime - startTime
