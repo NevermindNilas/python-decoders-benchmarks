@@ -24,7 +24,10 @@ from src.backends.decord import decodeWithDecord
 from src.backends.deffcode import decodeWithDeffcode
 from src.backends.maxTheoretical import decodeWithMaxTheoretical
 from src.backends.basswoodav import decodeWithBasswoodAV
-from src.backends.videoreaderrs import decodeWithVideoReaderRS
+from src.backends.videoreaderrs import (
+    decodeWithVideoReaderRS,
+    decodeWithVideoReaderRSFast,
+)
 from src.backends.torchcodec import decodeWithTorchCodec
 from src.coloredPrints import lightcyan
 
@@ -103,6 +106,11 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> dict[str, Any]:
         Decoder(name="Decord", decoder=decodeWithDecord, cooling=coolingPeriod),
         Decoder(
             name="VideoReaderRS", decoder=decodeWithVideoReaderRS, cooling=coolingPeriod
+        ),
+        Decoder(
+            name="VideoReaderRSFast",
+            decoder=decodeWithVideoReaderRSFast,
+            cooling=coolingPeriod,
         ),
         Decoder(
             name="FFmpeg-Subprocess",
