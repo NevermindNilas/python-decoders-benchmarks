@@ -2,10 +2,10 @@ import time
 import subprocess
 import platform
 import cv2
-from typing import Dict, Any
+from typing import Any
 
 
-def decodeWithMaxTheoretical(videoPath: str) -> Dict[str, Any]:
+def decodeWithMaxTheoretical(videoPath: str) -> dict[str, Any]:
     """
     Measure theoretical maximum decoding speed by using ffmpeg with output
     piped to devnull. This eliminates overhead from Python processing.

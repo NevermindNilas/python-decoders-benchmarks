@@ -5,10 +5,10 @@ try:
 except ImportError:
     print("PyVideoReader error: https://github.com/gcanat/video_reader-rs/issues/52")
 
-from typing import Dict, Any
+from typing import Any
 
 
-def decodeWithVideoReaderRS(videoPath: str) -> Dict[str, Any]:
+def decodeWithVideoReaderRS(videoPath: str) -> dict[str, Any]:
     """Decode video using VideoReaderRS and return metrics."""
     try:
         print("Decoding with VideoReaderRS...")

@@ -1,9 +1,9 @@
 import time
 import torchaudio
-from typing import Dict, Any
+from typing import Any
 
 
-def decodeWithTorchaudio(videoPath: str) -> Dict[str, Any]:
+def decodeWithTorchaudio(videoPath: str) -> dict[str, Any]:
     """Decode video using torchaudio and return metrics."""
     try:
         print("Decoding with torchaudio...")
