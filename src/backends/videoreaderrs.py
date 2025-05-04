@@ -35,7 +35,7 @@ def decodeWithVideoReaderRS(videoPath: str) -> dict[str, Any]:
                 start_frame=i,
                 end_frame=end,
             )
-            frameCount += chunkSize
+            frameCount += end
 
         endTime = time.time()
         elapsedTime = endTime - startTime

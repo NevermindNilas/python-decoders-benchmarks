@@ -80,7 +80,7 @@ class Decoder:
     name: str
     decoder: Callable[[str], dict[str, Any]] | Callable[[str, Any], dict[str, Any]]
     cooling: float | int = 3
-    video_info: Any | None = None
+    videoInfo: Any | None = None
 
 
 def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> dict[str, Any]:
@@ -95,55 +95,54 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> dict[str, Any]:
     systemInfo = getSystemInfo()
 
     decoders: list[Decoder] = [
-        Decoder(
-            name="PyAV", decoder=decodeWithPyAV, cooling=coolingPeriod
-        ),
-        Decoder(
-            name="BasswoodAV", decoder=decodeWithBasswoodAV, cooling=coolingPeriod
-        ),
-        Decoder(
-            name="OpenCV", decoder=decodeWithOpenCV, cooling=coolingPeriod
-        ),
-        Decoder(
-            name="torchaudio", decoder=decodeWithTorchaudio, cooling=coolingPeriod
-        ),
-        Decoder(
-            name="TorchCodec", decoder=decodeWithTorchCodec, cooling=coolingPeriod
-        ),
-        Decoder(
-            name="Decord", decoder=decodeWithDecord, cooling=coolingPeriod
-        ),
+        Decoder(name="PyAV", decoder=decodeWithPyAV, cooling=coolingPeriod),
+        Decoder(name="BasswoodAV", decoder=decodeWithBasswoodAV, cooling=coolingPeriod),
+        Decoder(name="OpenCV", decoder=decodeWithOpenCV, cooling=coolingPeriod),
+        Decoder(name="torchaudio", decoder=decodeWithTorchaudio, cooling=coolingPeriod),
+        Decoder(name="TorchCodec", decoder=decodeWithTorchCodec, cooling=coolingPeriod),
+        Decoder(name="Decord", decoder=decodeWithDecord, cooling=coolingPeriod),
         Decoder(
             name="VideoReaderRS", decoder=decodeWithVideoReaderRS, cooling=coolingPeriod
         ),
         Decoder(
-            name="FFmpeg-Subprocess", decoder=decodeWithFFMPEG_RGB24, cooling=coolingPeriod, video_info=videoInfo
+            name="FFmpeg-Subprocess",
+            decoder=decodeWithFFMPEG_RGB24,
+            cooling=coolingPeriod,
+            videoInfo=videoInfo,
         ),
         Decoder(
-            name="FFMPEGCV (Block)", decoder=decodeWithFFMPEGCV_Block, cooling=coolingPeriod
+            name="FFMPEGCV (Block)",
+            decoder=decodeWithFFMPEGCV_Block,
+            cooling=coolingPeriod,
         ),
         Decoder(
-            name="FFmpegCV-NoBlock", decoder=decodeWithFFMPEGCV_NoBlock, cooling=coolingPeriod
+            name="FFmpegCV-NoBlock",
+            decoder=decodeWithFFMPEGCV_NoBlock,
+            cooling=coolingPeriod,
         ),
         Decoder(
-            name="Imageio-ffmpeg", decoder=decodeWithImageioFFMPEG, cooling=coolingPeriod
+            name="Imageio-ffmpeg",
+            decoder=decodeWithImageioFFMPEG,
+            cooling=coolingPeriod,
         ),
+        Decoder(name="Deffcode", decoder=decodeWithDeffcode, cooling=coolingPeriod),
         Decoder(
-            name="Deffcode", decoder=decodeWithDeffcode, cooling=coolingPeriod
-        ),
-        Decoder(
-            name="Max Theoretical", decoder=decodeWithMaxTheoretical, cooling=coolingPeriod
+            name="Max Theoretical",
+            decoder=decodeWithMaxTheoretical,
+            cooling=coolingPeriod,
         ),
     ]
 
     decodingResults: dict[str, Any] = {}
     for i, decoder in enumerate(decoders):
-        print(lightcyan(f"\n({i + 1}/{len(decoders)}) Running {decoder.name} decoder..."))
+        print(
+            lightcyan(f"\n({i + 1}/{len(decoders)}) Running {decoder.name} decoder...")
+        )
         decoderFCT = decoder.decoder
         decodingResults[decoder.name] = (
             decoderFCT(videoPath)
             if decoderFCT.__code__.co_argcount == 1
-            else decoderFCT(videoPath, decoder.video_info)
+            else decoderFCT(videoPath, decoder.videoInfo)
         )
         time.sleep(decoder.cooling)
 
@@ -331,7 +330,9 @@ def printResultsSummary(results: dict[str, Any]) -> None:
         fastestDecoderFps = fastestDecoder[1].get("fps", 0)
         print(f"\nFastest decoder: {fastestDecoderName} ({fastestDecoderFps:.2f} fps)")
     else:
-        print(lightcyan("\nNo valid decoders ran successfully to determine the fastest."))
+        print(
+            lightcyan("\nNo valid decoders ran successfully to determine the fastest.")
+        )
 
 
 def main() -> None:
@@ -358,7 +359,7 @@ def main() -> None:
     # Use custom video file
     if arguments.input:
         videoPath = absolutePath(arguments.input)
-    
+
     # If not exists, download
     if not os.path.isfile(videoPath):
         os.makedirs(videoDir, exist_ok=True)
