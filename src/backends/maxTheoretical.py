@@ -20,8 +20,6 @@ def decodeWithMaxTheoretical(videoPath: str) -> dict[str, Any]:
         except Exception as e:
             print(f"Warning: Failed to get frame count with OpenCV: {str(e)}")
 
-        startTime = time.time()
-
         cmd = [
             "ffmpeg",
             "-i",
@@ -39,6 +37,8 @@ def decodeWithMaxTheoretical(videoPath: str) -> dict[str, Any]:
 
         if platform.system() == "Windows":
             cmd[-1] = "NUL"
+
+        startTime = time.time()
 
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
         _, stderr = process.communicate()
