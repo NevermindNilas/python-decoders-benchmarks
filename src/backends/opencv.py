@@ -1,9 +1,9 @@
 import time
 import cv2
-from typing import Dict, Any
+from typing import Any
 
 
-def decodeWithOpenCV(videoPath: str) -> Dict[str, Any]:
+def decodeWithOpenCV(videoPath: str) -> dict[str, Any]:
     """Decode video using OpenCV and return the frame count."""
     try:
         print("Decoding with OpenCV...")

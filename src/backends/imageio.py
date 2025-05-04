@@ -1,10 +1,10 @@
 import time
 import imageio_ffmpeg
 import numpy as np
-from typing import Dict, Any
+from typing import Any
 
 
-def decodeWithImageioFFMPEG(videoPath: str) -> Dict[str, Any]:
+def decodeWithImageioFFMPEG(videoPath: str) -> dict[str, Any]:
     """Decode video using imageio-ffmpeg and return metrics."""
     try:
         print("Decoding with imageio-ffmpeg...")

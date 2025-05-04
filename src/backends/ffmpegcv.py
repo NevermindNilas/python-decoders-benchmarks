@@ -1,9 +1,9 @@
 import time
 import ffmpegcv
-from typing import Dict, Any
+from typing import Any
 
 
-def decodeWithFFMPEGCV_Block(videoPath: str) -> Dict[str, Any]:
+def decodeWithFFMPEGCV_Block(videoPath: str) -> dict[str, Any]:
     """Decode video using ffmpegcv (with Block) and return metrics."""
     try:
         print("Decoding with ffmpegcv (with Block)...")
@@ -41,7 +41,7 @@ def decodeWithFFMPEGCV_Block(videoPath: str) -> Dict[str, Any]:
         }
 
 
-def decodeWithFFMPEGCV_NoBlock(videoPath: str) -> Dict[str, Any]:
+def decodeWithFFMPEGCV_NoBlock(videoPath: str) -> dict[str, Any]:
     """Decode video using ffmpegcv (without Block) and return metrics."""
     try:
         print("Decoding with ffmpegcv (without Block)...")

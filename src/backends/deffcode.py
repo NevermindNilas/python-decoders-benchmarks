@@ -1,10 +1,10 @@
 import time
 
 from deffcode import FFdecoder
-from typing import Dict, Any
+from typing import Any
 
 
-def decodeWithDeffcode(videoPath: str) -> Dict[str, Any]:
+def decodeWithDeffcode(videoPath: str) -> dict[str, Any]:
     """Decode video using FFDecoder and return metrics."""
     try:
         print("Decoding with FFDecoder...")

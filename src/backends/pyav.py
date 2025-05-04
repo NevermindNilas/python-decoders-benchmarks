@@ -1,9 +1,9 @@
 import av
 import time
-from typing import Dict, Any
+from typing import Any
 
 
-def decodeWithPyAV(videoPath: str) -> Dict[str, Any]:
+def decodeWithPyAV(videoPath: str) -> dict[str, Any]:
     """Decode video using PyAV and return the frame count."""
     try:
         print("Decoding with PyAV...")

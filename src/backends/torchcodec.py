@@ -1,6 +1,6 @@
 import time
 import torch
-from typing import Dict, Any
+from typing import Any
 
 try:
     from torchcodec.decoders import VideoDecoder
@@ -8,7 +8,7 @@ except ImportError:
     print("torchcodec error: Not supported on Windows yet.")
 
 
-def decodeWithTorchCodec(videoPath: str) -> Dict[str, Any]:
+def decodeWithTorchCodec(videoPath: str) -> dict[str, Any]:
     """Decode video using torchaudio and return metrics."""
     try:
         print("Decoding with torchaudio...")
@@ -38,7 +38,7 @@ def decodeWithTorchCodec(videoPath: str) -> Dict[str, Any]:
             "fps": frameCount / elapsedTime if elapsedTime > 0 else 0,
         }
     except Exception as e:
-        print(f"Error in torchaudio decoder: {str(e)}")
+        print(f"Error in torchcodec decoder: {str(e)}")
         return {
             "error": str(e),
             "frameCount": 0,

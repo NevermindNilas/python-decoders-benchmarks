@@ -1,9 +1,9 @@
 import time
 import decord
-from typing import Dict, Any
+from typing import Any
 
 
-def decodeWithDecord(videoPath: str) -> Dict[str, Any]:
+def decodeWithDecord(videoPath: str) -> dict[str, Any]:
     """Decode video using Decord and return metrics."""
     try:
         print("Decoding with Decord...")

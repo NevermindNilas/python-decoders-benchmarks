@@ -2,10 +2,10 @@ import subprocess
 import time
 import numpy as np
 import cv2
-from typing import Dict, Any
+from typing import Any
 
 
-def decodeWithFFMPEG_RGB24(videoPath: str, videoInfo) -> Dict[str, Any]:
+def decodeWithFFMPEG_RGB24(videoPath: str, videoInfo) -> dict[str, Any]:
     """Decode video using FFMPEG with rawvideo format and return metrics."""
     try:
         print("Decoding with FFMPEG (rawvideo, rgb24)...")
@@ -33,20 +33,17 @@ def decodeWithFFMPEG_RGB24(videoPath: str, videoInfo) -> Dict[str, Any]:
         processedFrames = 0
         bytesPerFrame = width * height * 3
 
-        while True:
-            rawFrame = process.stdout.read(bytesPerFrame)
-            if len(rawFrame) < bytesPerFrame:
-                break
-
-            frameArray = np.frombuffer(rawFrame, dtype=np.uint8).reshape(
-                height, width, 3
-            )
-            frameArray = np.transpose(frameArray, (2, 0, 1))  # CHW format
-
-            processedFrames += 1
-
-        process.stdout.close()
-        process.wait()
+        try:
+            while True:
+                rawFrame = process.stdout.read(bytesPerFrame)
+                frameArray = np.frombuffer(rawFrame, dtype=np.uint8).reshape(
+                    height, width, 3
+                )
+                frameArray = np.transpose(frameArray, (2, 0, 1))  # CHW format
+                processedFrames += 1
+        except:
+            if len(rawFrame) != 0 and len(rawFrame) != bytesPerFrame:
+                raise ValueError(f"Error: waiting for {bytesPerFrame} bytes, received {len(rawFrame)} bytes")
 
         endTime = time.time()
         elapsedTime = endTime - startTime
@@ -70,7 +67,7 @@ def decodeWithFFMPEG_RGB24(videoPath: str, videoInfo) -> Dict[str, Any]:
         }
 
 
-def decodeWithFFMPEG_YUV420(videoPath: str, videoInfo) -> Dict[str, Any]:
+def decodeWithFFMPEG_YUV420(videoPath: str, videoInfo) -> dict[str, Any]:
     """Decode video using FFMPEG with yuv420p format and return metrics."""
     try:
         print("Decoding with FFMPEG (rawvideo, yuv420p)...")
