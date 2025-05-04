@@ -23,7 +23,7 @@ This project benchmarks the performance (Frames Per Second - FPS) of various Pyt
     *   [TorchAudio](https://pytorch.org/audio/stable/index.html) ( requires FFMPEG v6, I can't test it. )
     *   [DeffCode](https://abhitronix.github.io/deffcode/latest/)
     *   [BasswoodAV](https://av.basswood-io.com/docs/stable/) ( pyav continutation )
-    *   [Video-Reader-RS](https://github.com/gcanat/video_reader-rs)(Doesn't currently [work on Windows](https://github.com/gcanat/video_reader-rs/issues/52) and the documentation is iffy, take with a grain of salt.)
+    *   [Video-Reader-RS](https://github.com/gcanat/video_reader-rs)( Base run uses pure rgb24 decode afaik whilst the Fast run decodes in yuv420p and then converts it to rgb24 on the rust side to speed things up, altho' I am not entirely sure how this would hold up if the input was in other color formats say yuv422, yuv444 or rgb48 )
     *   **Max Theoretical**: Baseline performance using raw `ffmpeg` subprocess ([`decodeWithMaxTheoretical`](src/backends/maxTheoretical.py)) to estimate maximum hardware FPS with minimal overhead.
 
 
