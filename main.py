@@ -1,6 +1,3 @@
-from argparse import ArgumentParser
-from dataclasses import dataclass
-from enum import IntEnum
 import os
 import json
 import signal
@@ -8,13 +5,15 @@ import time
 import urllib.request
 import traceback
 import platform
-from typing import Any, Callable
-
-import cv2
-
 import psutil
+import cv2
 import matplotlib.pyplot as plt
 
+from argparse import ArgumentParser
+from dataclasses import dataclass
+from typing import Any, Callable
+
+# src imports
 from src.backends.ffmpeg import decodeWithFFMPEG_RGB24
 from src.backends.imageio import decodeWithImageioFFMPEG
 from src.backends.opencv import decodeWithOpenCV
@@ -27,22 +26,10 @@ from src.backends.maxTheoretical import decodeWithMaxTheoretical
 from src.backends.basswoodav import decodeWithBasswoodAV
 from src.backends.videoreaderrs import decodeWithVideoReaderRS
 from src.backends.torchcodec import decodeWithTorchCodec
+from src.coloredPrints import lightcyan
 
 
-class ColorCode(IntEnum):
-    lightgreen = 92
-    lightcyan = 96
-
-def _color_str_template(color: ColorCode) -> str:
-    return "\033[%dm{}\033[00m" % (color.value)
-
-def lightgreen(*values: object) -> str:
-    return _color_str_template(ColorCode.lightgreen).format(values[0])
-
-def lightcyan(*values: object) -> str:
-    return _color_str_template(ColorCode.lightcyan).format(values[0])
-
-def absolute_path(path: str) -> str:
+def absolutePath(path: str) -> str:
     if path is not None and path != "":
         return os.path.abspath(os.path.expanduser(str(path)))
     return path
@@ -130,16 +117,16 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> dict[str, Any]:
             name="VideoReaderRS", decoder=decodeWithVideoReaderRS, cooling=coolingPeriod
         ),
         Decoder(
-            name="FFMPEGCV (Block)", decoder=decodeWithFFMPEGCV_Block, cooling=coolingPeriod
-        ),
-        Decoder(
             name="FFmpeg-Subprocess", decoder=decodeWithFFMPEG_RGB24, cooling=coolingPeriod, video_info=videoInfo
         ),
         Decoder(
-            name="Imageio-ffmpeg", decoder=decodeWithImageioFFMPEG, cooling=coolingPeriod
+            name="FFMPEGCV (Block)", decoder=decodeWithFFMPEGCV_Block, cooling=coolingPeriod
         ),
         Decoder(
             name="FFmpegCV-NoBlock", decoder=decodeWithFFMPEGCV_NoBlock, cooling=coolingPeriod
+        ),
+        Decoder(
+            name="Imageio-ffmpeg", decoder=decodeWithImageioFFMPEG, cooling=coolingPeriod
         ),
         Decoder(
             name="Deffcode", decoder=decodeWithDeffcode, cooling=coolingPeriod
@@ -149,14 +136,14 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> dict[str, Any]:
         ),
     ]
 
-    decoding_results: dict[str, Any] = {}
+    decodingResults: dict[str, Any] = {}
     for i, decoder in enumerate(decoders):
         print(lightcyan(f"\n({i + 1}/{len(decoders)}) Running {decoder.name} decoder..."))
-        decoder_fct = decoder.decoder
-        decoding_results[decoder.name] = (
-            decoder_fct(videoPath)
-            if decoder_fct.__code__.co_argcount == 1
-            else decoder_fct(videoPath, decoder.video_info)
+        decoderFCT = decoder.decoder
+        decodingResults[decoder.name] = (
+            decoderFCT(videoPath)
+            if decoderFCT.__code__.co_argcount == 1
+            else decoderFCT(videoPath, decoder.video_info)
         )
         time.sleep(decoder.cooling)
 
@@ -166,7 +153,7 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> dict[str, Any]:
         "videoPath": videoPath,
         "videoInfo": videoInfo,
         "systemInfo": systemInfo,
-        "decoders": decoding_results,
+        "decoders": decodingResults,
     }
 
     return results
@@ -370,8 +357,8 @@ def main() -> None:
 
     # Use custom video file
     if arguments.input:
-        videoPath = absolute_path(arguments.input)
-
+        videoPath = absolutePath(arguments.input)
+    
     # If not exists, download
     if not os.path.isfile(videoPath):
         os.makedirs(videoDir, exist_ok=True)
