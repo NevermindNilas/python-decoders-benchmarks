@@ -17,8 +17,7 @@ def decodeWithImageioFFMPEG(videoPath: str) -> dict[str, Any]:
 
         frameCount = 1
         for frame in reader:
-            frameArray = np.frombuffer(frame, dtype=np.uint8).reshape(height, width, 3)
-            frameArray = np.transpose(frameArray, (2, 0, 1))  # CHW format
+            frame = np.frombuffer(frame, dtype=np.uint8).reshape(height, width, 3)
             frameCount += 1
 
         endTime = time.time()

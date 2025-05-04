@@ -13,6 +13,7 @@ def decodeWithBasswoodAV(videoPath: str) -> dict[str, Any]:
         frameCount = 0
 
         for frame in container.decode(video=0):
+            frame = frame.to_ndarray(format="rgb24") # ensure RGB
             frameCount += 1
 
         container.close()

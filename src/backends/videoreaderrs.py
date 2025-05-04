@@ -21,7 +21,7 @@ def decodeWithVideoReaderRS(videoPath: str) -> dict[str, Any]:
         # It doesn't seem to natively support a simple frame iterator,
         # May not be 100% accurate since the decode may happen async on rust side.
         # And simply yield 800 frames at a time which can artifically improve performance.
-        # It should default to np rgb chw format. But take it with a grain of salt since it doesn't work on windows
+        # It should default to np rgb hwc format. But take it with a grain of salt since it doesn't work on windows
         # and I don't want to bother with WSL.
 
         # Maybe using chunksize=1 would be more accurate, but potentially slower.

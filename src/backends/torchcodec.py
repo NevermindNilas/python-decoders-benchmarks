@@ -24,7 +24,7 @@ def decodeWithTorchCodec(videoPath: str) -> dict[str, Any]:
         frameCount = 0
         for i in range(totalFrames):
             # Get frame at index i
-            frame = decoder[i].cpu().numpy()  # rgb24 chw cpu
+            frame = decoder[i].cpu().numpy()  # rgb24 hwc cpu
             frameCount += 1
 
         endTime = time.time()
