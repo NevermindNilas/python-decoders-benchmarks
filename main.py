@@ -90,7 +90,9 @@ class Decoder:
     videoInfo: Any | None = None
 
 
-def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> dict[str, Any]:
+def runBenchmark(
+    videoPath: str, coolingPeriod: int = 3, systemInfo: dict = {}
+) -> dict[str, Any]:
     """Run benchmark on all decoders and return the results.
 
     Args:
@@ -99,7 +101,6 @@ def runBenchmark(videoPath: str, coolingPeriod: int = 3) -> dict[str, Any]:
     """
     print("Getting video information...")
     videoInfo = getVideoInfo(videoPath)
-    systemInfo = getSystemInfo()
 
     decoders: list[Decoder] = [
         Decoder(name="PyAV", decoder=decodeWithPyAV, cooling=coolingPeriod),
@@ -404,7 +405,10 @@ def main() -> None:
             if not os.path.isfile(video["path"]):
                 downloadVideo(video["url"], video["path"])
 
+    systemInfo = getSystemInfo()
+
     for i, video in enumerate(videos):
+        time.sleep(3)  # Cooldown before starting the next video
         videoPath = video["path"]
         resultsPath = video["results"]
         diagramPath = video["diagram"]
@@ -418,7 +422,9 @@ def main() -> None:
                 f"\nStarting benchmark {i + 1}/{len(videos)}: {os.path.basename(videoPath)}..."
             )
         )
-        results = runBenchmark(videoPath)
+        results = runBenchmark(
+            videoPath=videoPath, coolingPeriod=3, systemInfo=systemInfo
+        )
 
         printResultsSummary(results)
         saveResults(results, resultsPath)
