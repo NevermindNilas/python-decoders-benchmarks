@@ -245,7 +245,7 @@ def createPerformanceDiagram(results: dict[str, Any], outputPath: str) -> None:
         bars = plt.bar(
             decoderNames,
             fpsValues,
-            width=0.5,
+            width=0.3,
             color=[
                 "#3498db",
                 "#2ecc71",
