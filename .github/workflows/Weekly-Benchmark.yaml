@@ -46,11 +46,19 @@ jobs:
           Weekly benchmark results generated on ${{ steps.date.outputs.date }}.
 
           **Performance Chart:**
-          ![Benchmark Chart](https://github.com/${{ github.repository }}/releases/download/benchmark-${{ steps.date.outputs.date }}/decoder_performance.png)
 
-          See attached `results.json` for detailed metrics.
+          ***480x270 Benchmark:***
+          ![Benchmark Chart](https://github.com/${{ github.repository }}/releases/download/benchmark-${{ steps.date.outputs.date }}/480x270_diagram.png)
+
+          ***1280x720 Benchmark:***
+          ![Benchmark Chart](https://github.com/${{ github.repository }}/releases/download/benchmark-${{ steps.date.outputs.date }}/1280x720_diagram.png)
+
+          See attached `.json` for detailed metrics.
         files: |
-          results.json
-          decoder_performance.png
+          480x270_results.json
+          1280x720_results.json
+          480x270_diagram.png
+          1280x720_diagram.png
+        draft: false
       env:
         GITHUB_TOKEN: ${{ secrets.TAS }}

@@ -367,39 +367,62 @@ def main() -> None:
         type=str,
         default="",
         required=False,
-        help="Use a custom input video file.",
+        help="Use a custom input video file (overrides default videos).",
     )
     arguments = parser.parse_args()
-    # Input video
-    videoFilename: str = "sample_720p.mp4"
-    videoUrl: str = "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4"
-    videoDir: str = "videos"
-    videoPath: str = os.path.join(videoDir, videoFilename)
-    # Results
-    resultsPath: str = "results.json"
-    diagramPath: str = "decoder_performance.png"
 
-    # Use custom video file
+    defaultVideos = [
+        {
+            "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+            "path": os.path.join("videos", "ElephantsDream.mp4"),
+            "results": "480x270_results.json",
+            "diagram": "480x270_diagram.png",
+        },
+        {
+            "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+            "path": os.path.join("videos", "VolkswagenGTIReview.mp4"),
+            "results": "1280x720_results.json",
+            "diagram": "1280x720_diagram.png",
+        },
+    ]
+
     if arguments.input:
         videoPath = absolutePath(arguments.input)
+        basename = os.path.splitext(os.path.basename(videoPath))[0]
+        videos = [
+            {
+                "path": videoPath,
+                "results": f"{basename}_results.json",
+                "diagram": f"{basename}_performance.png",
+            }
+        ]
+    else:
+        videos = defaultVideos
+        os.makedirs("videos", exist_ok=True)
 
-    # If not exists, download
-    if not os.path.isfile(videoPath):
-        os.makedirs(videoDir, exist_ok=True)
-        downloadVideo(videoUrl, videoPath)
+        for video in videos:
+            if not os.path.isfile(video["path"]):
+                downloadVideo(video["url"], video["path"])
 
-    # Verify that it exists
-    if not os.path.isfile(videoPath):
-        print(f"Error: Expected video file at {videoPath}, but it's not a file.")
-        return
+    for i, video in enumerate(videos):
+        videoPath = video["path"]
+        resultsPath = video["results"]
+        diagramPath = video["diagram"]
 
-    print(lightcyan("\nStarting benchmark..."))
-    results = runBenchmark(videoPath)
+        if not os.path.isfile(videoPath):
+            print(f"Error: Expected video file at {videoPath}, but it's not a file.")
+            continue
 
-    printResultsSummary(results)
-    saveResults(results, resultsPath)
+        print(
+            lightcyan(
+                f"\nStarting benchmark {i + 1}/{len(videos)}: {os.path.basename(videoPath)}..."
+            )
+        )
+        results = runBenchmark(videoPath)
 
-    createPerformanceDiagram(results, diagramPath)
+        printResultsSummary(results)
+        saveResults(results, resultsPath)
+        createPerformanceDiagram(results, diagramPath)
 
 
 if __name__ == "__main__":
