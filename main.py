@@ -375,14 +375,14 @@ def main() -> None:
         {
             "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
             "path": os.path.join("videos", "ElephantsDream.mp4"),
-            "results": "480x270_results.json",
-            "diagram": "480x270_diagram.png",
+            "results": "1280x720_results.json",
+            "diagram": "1280x720_diagram.png",
         },
         {
             "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
             "path": os.path.join("videos", "VolkswagenGTIReview.mp4"),
-            "results": "1280x720_results.json",
-            "diagram": "1280x720_diagram.png",
+            "results": "480x270_results.json",
+            "diagram": "480x270_diagram.png",
         },
     ]
 
