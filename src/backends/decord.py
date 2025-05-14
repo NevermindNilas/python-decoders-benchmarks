@@ -7,11 +7,11 @@ def decodeWithDecord(videoPath: str) -> dict[str, Any]:
     """Decode video using Decord and return metrics."""
     try:
         print("Decoding with Decord...")
-        startTime = time.time()
 
         vr = decord.VideoReader(videoPath, ctx=decord.cpu(0))
         frameCount = 0
 
+        startTime = time.time()
         for i in range(len(vr)):
             frame = vr[i]
             frameCount += 1

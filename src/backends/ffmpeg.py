@@ -9,9 +9,7 @@ def decodeWithFFMPEG_RGB24(videoPath: str, videoInfo) -> dict[str, Any]:
     """Decode video using FFMPEG with rawvideo format and return metrics."""
     try:
         print("Decoding with FFMPEG (rawvideo, rgb24)...")
-        startTime = time.time()
 
-        # Get video info for dimensions needed for numpy reshaping
         width = videoInfo["width"]
         height = videoInfo["height"]
 
@@ -28,6 +26,7 @@ def decodeWithFFMPEG_RGB24(videoPath: str, videoInfo) -> dict[str, Any]:
             "-",  # Output to stdout
         ]
 
+        startTime = time.time()
         process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         processedFrames = 0

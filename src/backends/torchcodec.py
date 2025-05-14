@@ -12,7 +12,6 @@ def decodeWithTorchCodec(videoPath: str) -> dict[str, Any]:
     """Decode video using torchaudio and return metrics."""
     try:
         print("Decoding with torchaudio...")
-        startTime = time.time()
 
         decoder = VideoDecoder(
             videoPath,
@@ -21,6 +20,7 @@ def decodeWithTorchCodec(videoPath: str) -> dict[str, Any]:
 
         totalFrames = decoder.metadata.num_frames
 
+        startTime = time.time()
         frameCount = 0
         for i in range(totalFrames):
             # Get frame at index i

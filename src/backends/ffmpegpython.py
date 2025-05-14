@@ -8,7 +8,6 @@ def decodeWithFFmpegPython(videoPath: str, videoInfo) -> dict[str, Any]:
     """Decode video using ffmpeg-python and return metrics."""
     try:
         print("Decoding with ffmpeg-python...")
-        startTime = time.time()
 
         width = videoInfo["width"]
         height = videoInfo["height"]
@@ -20,6 +19,7 @@ def decodeWithFFmpegPython(videoPath: str, videoInfo) -> dict[str, Any]:
             .run_async(pipe_stdout=True)
         )
 
+        startTime = time.time()
         frameCount = 0
         while True:
             inBytes = process.stdout.read(bytesPerFrame)

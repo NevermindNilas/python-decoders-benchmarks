@@ -7,13 +7,13 @@ def decodeWithPyAV(videoPath: str) -> dict[str, Any]:
     """Decode video using PyAV and return the frame count."""
     try:
         print("Decoding with PyAV...")
-        startTime = time.time()
 
         container = av.open(videoPath)
         frameCount = 0
 
+        startTime = time.time()
         for frame in container.decode(video=0):
-            frame = frame.to_ndarray(format="rgb24") # ensure RGB
+            frame = frame.to_ndarray(format="rgb24")  # ensure RGB
             frameCount += 1
 
         container.close()

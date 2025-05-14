@@ -7,12 +7,12 @@ def decodeWithOpenCV(videoPath: str) -> dict[str, Any]:
     """Decode video using OpenCV and return the frame count."""
     try:
         print("Decoding with OpenCV...")
-        startTime = time.time()
 
         cap = cv2.VideoCapture(videoPath)
         frameCount = 0
         totalFrames = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
+        startTime = time.time()
         # Switched to for loops for potentially better performance
         # May not be as accurate as using while loop due to potentially skipping frames
         # OpenCV cv2.CAP_PROP_FRAME_COUNT is not always accurate, hope that it works.

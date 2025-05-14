@@ -8,11 +8,11 @@ def decodeWithDeffcode(videoPath: str) -> dict[str, Any]:
     """Decode video using FFDecoder and return metrics."""
     try:
         print("Decoding with FFDecoder...")
-        startTime = time.time()
 
         decoder = FFdecoder(videoPath, verbose=False).formulate()
         frameCount = 0
 
+        startTime = time.time()
         for frame in decoder.generateFrame():
             if frame is None:
                 break

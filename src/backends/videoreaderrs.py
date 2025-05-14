@@ -12,7 +12,6 @@ def decodeWithVideoReaderRS(videoPath: str) -> dict[str, Any]:
     """Decode video using VideoReaderRS and return metrics."""
     try:
         print("Decoding with VideoReaderRS...")
-        startTime = time.time()
 
         reader = PyVideoReader(videoPath)
         frameCount = 0
@@ -28,6 +27,7 @@ def decodeWithVideoReaderRS(videoPath: str) -> dict[str, Any]:
         chunkSize = 800
         videoLenght = reader.get_shape()[0]
 
+        startTime = time.time()
         frameCount = 0
         for i in range(0, videoLenght, chunkSize):
             end = min(i + chunkSize, videoLenght)
@@ -65,7 +65,6 @@ def decodeWithVideoReaderRSFast(videoPath: str) -> dict[str, Any]:
     """Decode video using VideoReaderRS and return metrics."""
     try:
         print("Decoding with VideoReaderRS...")
-        startTime = time.time()
 
         reader = PyVideoReader(videoPath)
         frameCount = 0
@@ -78,6 +77,7 @@ def decodeWithVideoReaderRSFast(videoPath: str) -> dict[str, Any]:
         chunkSize = 800
         videoLenght = reader.get_shape()[0]
 
+        startTime = time.time()
         frameCount = 0
         for i in range(0, videoLenght, chunkSize):
             end = min(i + chunkSize, videoLenght)

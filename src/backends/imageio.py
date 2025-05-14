@@ -8,13 +8,13 @@ def decodeWithImageioFFMPEG(videoPath: str) -> dict[str, Any]:
     """Decode video using imageio-ffmpeg and return metrics."""
     try:
         print("Decoding with imageio-ffmpeg...")
-        startTime = time.time()
 
         reader = imageio_ffmpeg.read_frames(videoPath)
         meta = next(reader)
         width = meta["size"][0]
         height = meta["size"][1]
 
+        startTime = time.time()
         frameCount = 1
         for frame in reader:
             frame = np.frombuffer(frame, dtype=np.uint8).reshape(height, width, 3)

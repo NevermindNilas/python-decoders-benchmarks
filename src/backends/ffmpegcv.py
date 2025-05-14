@@ -7,11 +7,11 @@ def decodeWithFFMPEGCV_Block(videoPath: str) -> dict[str, Any]:
     """Decode video using ffmpegcv (with Block) and return metrics."""
     try:
         print("Decoding with ffmpegcv (with Block)...")
-        startTime = time.time()
 
         cap = ffmpegcv.VideoCapture(videoPath, pix_fmt="rgb24")
         frameCount = 0
 
+        startTime = time.time()
         while True:
             ret, frame = cap.read()
             if not ret:
