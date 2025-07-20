@@ -33,6 +33,11 @@ from src.backends.videoreaderrs import (
 )
 from src.backends.torchcodec import decodeWithTorchCodec
 from src.backends.ffmpegpython import decodeWithFFmpegPython
+from src.backends.colorConversionAnalysis import (
+    analyzeColorConversionDifferences,
+    analyzeVideoColorProperties,
+)
+from src.backends.celux import decodeWithCeLux
 from src.coloredPrints import lightcyan
 
 
@@ -103,6 +108,7 @@ def runBenchmark(
     videoInfo = getVideoInfo(videoPath)
 
     decoders: list[Decoder] = [
+        Decoder(name="CeLux", decoder=decodeWithCeLux, cooling=coolingPeriod),
         Decoder(name="PyAV", decoder=decodeWithPyAV, cooling=coolingPeriod),
         Decoder(name="BasswoodAV", decoder=decodeWithBasswoodAV, cooling=coolingPeriod),
         Decoder(name="OpenCV", decoder=decodeWithOpenCV, cooling=coolingPeriod),
@@ -358,79 +364,46 @@ def printResultsSummary(results: dict[str, Any]) -> None:
             lightcyan("\nNo valid decoders ran successfully to determine the fastest.")
         )
 
+    # Display color conversion analysis results if available
+    if "colorConversionAnalysis" in results:
+        colorAnalysis = results["colorConversionAnalysis"]
+        if "error" not in colorAnalysis:
+            print(lightcyan("\n===== COLOR CONVERSION ANALYSIS ====="))
+            print("Analyzing YUV420p to RGB24 conversion differences...")
 
-def main() -> None:
-    """Main function to run the benchmark."""
-    parser = ArgumentParser()
-    parser.add_argument(
-        "--input",
-        "-i",
-        type=str,
-        default="",
-        required=False,
-        help="Use a custom input video file (overrides default videos).",
-    )
-    arguments = parser.parse_args()
+            # Display video color properties
+            if "videoColorProperties" in results:
+                colorProps = results["videoColorProperties"]
+                if "error" not in colorProps:
+                    print(f"Video format: {colorProps.get('pix_fmt', 'unknown')}")
+                    print(f"Color range: {colorProps.get('color_range', 'unknown')}")
+                    print(f"Color space: {colorProps.get('color_space', 'unknown')}")
 
-    defaultVideos = [
-        {
-            "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-            "path": os.path.join("videos", "ElephantsDream.mp4"),
-            "results": "1280x720_results.json",
-            "diagram": "1280x720_diagram.png",
-        },
-        {
-            "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
-            "path": os.path.join("videos", "VolkswagenGTIReview.mp4"),
-            "results": "480x270_results.json",
-            "diagram": "480x270_diagram.png",
-        },
-    ]
+            # Display summary results for each comparison
+            summaries = colorAnalysis.get("summary", {})
+            if summaries:
+                for comparison_name, summary in summaries.items():
+                    decoder_name = comparison_name.replace("FFmpeg_Default_vs_", "")
+                    print(f"\nFFmpeg vs {decoder_name}:")
 
-    if arguments.input:
-        videoPath = absolutePath(arguments.input)
-        basename = os.path.splitext(os.path.basename(videoPath))[0]
-        videos = [
-            {
-                "path": videoPath,
-                "results": f"{basename}_results.json",
-                "diagram": f"{basename}_performance.png",
-            }
-        ]
-    else:
-        videos = defaultVideos
-        os.makedirs("videos", exist_ok=True)
+                    # Key metrics
+                    brightness_diff = summary.get("brightness_diff_mean", 0)
+                    mae_mean = summary.get("mae_mean", 0)
+                    psnr_mean = summary.get("psnr_mean", 0)
 
-        for video in videos:
-            if not os.path.isfile(video["path"]):
-                downloadVideo(video["url"], video["path"])
+                    print(f"  Average brightness difference: {brightness_diff:.2f}")
+                    print(f"  Mean Absolute Error: {mae_mean:.2f}")
+                    print(f"  Peak Signal-to-Noise Ratio: {psnr_mean:.2f} dB")
 
-    systemInfo = getSystemInfo()
-
-    for i, video in enumerate(videos):
-        time.sleep(3)  # Cooldown before starting the next video
-        videoPath = video["path"]
-        resultsPath = video["results"]
-        diagramPath = video["diagram"]
-
-        if not os.path.isfile(videoPath):
-            print(f"Error: Expected video file at {videoPath}, but it's not a file.")
-            continue
-
-        print(
-            lightcyan(
-                f"\nStarting benchmark {i + 1}/{len(videos)}: {os.path.basename(videoPath)}..."
-            )
-        )
-        results = runBenchmark(
-            videoPath=videoPath, coolingPeriod=3, systemInfo=systemInfo
-        )
-
-        printResultsSummary(results)
-        saveResults(results, resultsPath)
-        createPerformanceDiagram(results, diagramPath)
-
-
-if __name__ == "__main__":
-    signal.signal(signal.SIGINT, signal.SIG_DFL)
-    main()
+                    # Interpretations
+                    interpretations = summary.get("interpretation", [])
+                    if interpretations:
+                        print("  Issues detected:")
+                        for interpretation in interpretations:
+                            print(f"    - {interpretation}")
+                    else:
+                        print("  No significant color conversion issues detected.")
+            else:
+                print("No comparison summaries available.")
+        else:
+            print(f"\nColor conversion analysis failed: {colorAnalysis['error']}")
