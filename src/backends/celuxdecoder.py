@@ -1,6 +1,10 @@
 import time
 from typing import Any
-from celux import VideoReader
+
+try:
+    from celux import VideoReader
+except ImportError:
+    print("CeLux error: Not supported on this platform or missing dependencies.")
 
 
 def decodeWithCeLux(videoPath: str) -> dict[str, Any]:

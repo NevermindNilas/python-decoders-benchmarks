@@ -40,8 +40,8 @@ def decodeWithMaxTheoreticalRGB(videoPath: str) -> dict[str, Any]:
 
         startTime = time.time()
 
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        _, stderr = process.communicate()
+        process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # process.run returns a CompletedProcess, no need to call communicate()
 
         endTime = time.time()
         elapsedTime = endTime - startTime
@@ -100,8 +100,8 @@ def decodeWithMaxTheoreticalYUV420(videoPath: str) -> dict[str, Any]:
 
         startTime = time.time()
 
-        process = subprocess.Popen(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-        _, stderr = process.communicate()
+        process = subprocess.run(cmd, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        # process.run returns a CompletedProcess, no need to call communicate()
 
         endTime = time.time()
         elapsedTime = endTime - startTime
@@ -123,3 +123,13 @@ def decodeWithMaxTheoreticalYUV420(videoPath: str) -> dict[str, Any]:
             "elapsedTime": 0,
             "fps": 0,
         }
+
+
+if __name__ == "__main__":
+    # Example usage
+    videoPath = r"F:\testVideos\output_bt601.mp4"
+    rgb_result = decodeWithMaxTheoreticalRGB(videoPath)
+    print(rgb_result)
+
+    yuv_result = decodeWithMaxTheoreticalYUV420(videoPath)
+    print(yuv_result)

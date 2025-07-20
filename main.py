@@ -263,6 +263,10 @@ def createPerformanceDiagram(results: dict[str, Any], outputPath: str) -> None:
                 "#34495e",
                 "#f1c40f",
                 "#e67e22",
+                "#95a5a6",
+                "#7f8c8d",
+                "#d35400",
+                "#c0392b",
             ][: len(decoderNames)],
         )
 
@@ -313,6 +317,33 @@ def createPerformanceDiagram(results: dict[str, Any], outputPath: str) -> None:
     except Exception as e:
         print(f"Error creating performance diagram: {str(e)}")
         traceback.print_exc()
+
+
+def generate_frame_count_markdown(results: dict[str, Any], outputPath: str) -> None:
+    """Generate a markdown table comparing frame counts to OpenCV and save it."""
+    decoders = results.get("decoders", {})
+    opencv_count = None
+    if "OpenCV" in decoders and "frameCount" in decoders["OpenCV"]:
+        opencv_count = decoders["OpenCV"]["frameCount"]
+    else:
+        opencv_count = None
+
+    lines = []
+    lines.append("| Decoder | Frames Decoded | Matches OpenCV? |")
+    lines.append("|---------|----------------|-----------------|")
+
+    for decoder, data in decoders.items():
+        frame_count = data.get("frameCount", "N/A")
+        if opencv_count is not None and isinstance(frame_count, int):
+            match = "✅" if frame_count == opencv_count else "❌"
+        else:
+            match = "N/A"
+        lines.append(f"| {decoder} | {frame_count} | {match} |")
+
+    markdown = "\n".join(lines)
+    with open(outputPath, "w", encoding="utf-8") as f:
+        f.write(markdown)
+    print(f"Frame count comparison markdown saved to {outputPath}")
 
 
 def printResultsSummary(results: dict[str, Any]) -> None:
@@ -473,6 +504,8 @@ def main() -> None:
 
         diagramPath = video["diagram"]
 
+        markdownPath = os.path.splitext(resultsPath)[0] + "_frame_count_comparison.md"
+
         if not os.path.isfile(videoPath):
             print(f"Error: Expected video file at {videoPath}, but it's not a file.")
 
@@ -491,6 +524,8 @@ def main() -> None:
         printResultsSummary(results)
 
         saveResults(results, resultsPath)
+
+        generate_frame_count_markdown(results, markdownPath)
 
         createPerformanceDiagram(results, diagramPath)
 
