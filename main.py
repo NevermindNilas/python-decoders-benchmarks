@@ -407,3 +407,95 @@ def printResultsSummary(results: dict[str, Any]) -> None:
                 print("No comparison summaries available.")
         else:
             print(f"\nColor conversion analysis failed: {colorAnalysis['error']}")
+
+
+def main() -> None:
+    """Main function to run the benchmark."""
+
+    parser = ArgumentParser()
+
+    parser.add_argument(
+        "--input",
+        "-i",
+        type=str,
+        default="",
+        required=False,
+        help="Use a custom input video file (overrides default videos).",
+    )
+
+    arguments = parser.parse_args()
+
+    defaultVideos = [
+        {
+            "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
+            "path": os.path.join("videos", "ElephantsDream.mp4"),
+            "results": "1280x720_results.json",
+            "diagram": "1280x720_diagram.png",
+        },
+        {
+            "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
+            "path": os.path.join("videos", "VolkswagenGTIReview.mp4"),
+            "results": "480x270_results.json",
+            "diagram": "480x270_diagram.png",
+        },
+    ]
+
+    if arguments.input:
+        videoPath = absolutePath(arguments.input)
+
+        basename = os.path.splitext(os.path.basename(videoPath))[0]
+
+        videos = [
+            {
+                "path": videoPath,
+                "results": f"{basename}_results.json",
+                "diagram": f"{basename}_performance.png",
+            }
+        ]
+
+    else:
+        videos = defaultVideos
+
+        os.makedirs("videos", exist_ok=True)
+
+        for video in videos:
+            if not os.path.isfile(video["path"]):
+                downloadVideo(video["url"], video["path"])
+
+    systemInfo = getSystemInfo()
+
+    for i, video in enumerate(videos):
+        time.sleep(3)  # Cooldown before starting the next video
+
+        videoPath = video["path"]
+
+        resultsPath = video["results"]
+
+        diagramPath = video["diagram"]
+
+        if not os.path.isfile(videoPath):
+            print(f"Error: Expected video file at {videoPath}, but it's not a file.")
+
+            continue
+
+        print(
+            lightcyan(
+                f"\nStarting benchmark {i + 1}/{len(videos)}: {os.path.basename(videoPath)}..."
+            )
+        )
+
+        results = runBenchmark(
+            videoPath=videoPath, coolingPeriod=3, systemInfo=systemInfo
+        )
+
+        printResultsSummary(results)
+
+        saveResults(results, resultsPath)
+
+        createPerformanceDiagram(results, diagramPath)
+
+
+if __name__ == "__main__":
+    signal.signal(signal.SIGINT, signal.SIG_DFL)
+
+    main()
