@@ -11,7 +11,7 @@ except ImportError:
 def decodeWithTorchCodec(videoPath: str) -> dict[str, Any]:
     """Decode video using torchaudio and return metrics."""
     try:
-        print("Decoding with torchaudio...")
+        print("Decoding with torchcodec...")
 
         decoder = VideoDecoder(
             videoPath,
