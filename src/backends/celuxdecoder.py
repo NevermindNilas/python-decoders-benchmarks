@@ -1,5 +1,6 @@
 import time
 from typing import Any
+from celux import VideoReader
 
 
 def decodeWithCeLux(videoPath: str) -> dict[str, Any]:
@@ -7,12 +8,9 @@ def decodeWithCeLux(videoPath: str) -> dict[str, Any]:
     Decode video using CeLux and return the frame count, elapsed time, and fps.
     """
     try:
-        from celux import VideoReader, Scale
-
         print("Decoding with CeLux...")
 
-        filters = [Scale(width=None, height=None)]  # No resizing by default
-        reader = VideoReader(videoPath, filters=filters)
+        reader = VideoReader(videoPath)
         frameCount = 0
 
         startTime = time.time()
@@ -37,3 +35,9 @@ def decodeWithCeLux(videoPath: str) -> dict[str, Any]:
             "elapsedTime": 0,
             "fps": 0,
         }
+
+
+if __name__ == "__main__":
+    videoPath = r"F:\testVideos\output_bt601.mp4"
+    result = decodeWithCeLux(videoPath)
+    print(result)

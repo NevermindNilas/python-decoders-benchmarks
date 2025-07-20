@@ -37,7 +37,7 @@ from src.backends.colorConversionAnalysis import (
     analyzeColorConversionDifferences,
     analyzeVideoColorProperties,
 )
-from src.backends.celux import decodeWithCeLux
+from src.backends.celuxdecoder import decodeWithCeLux
 from src.coloredPrints import lightcyan
 
 
