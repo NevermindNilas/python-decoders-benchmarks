@@ -1,6 +1,8 @@
 import os
 import json
 import signal
+import statistics
+import subprocess
 import time
 import urllib.request
 import traceback
@@ -11,6 +13,7 @@ import matplotlib.pyplot as plt
 
 from argparse import ArgumentParser
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Any, Callable
 
 # src imports
@@ -54,10 +57,59 @@ def downloadVideo(url: str, outputPath: str) -> str:
     if not os.path.exists(os.path.dirname(outputPath)):
         os.makedirs(os.path.dirname(outputPath))
 
-    urllib.request.urlretrieve(url, outputPath)
+    # googleapis bucket rejects default urllib UA with HTTP 403
+    request = urllib.request.Request(
+        url,
+        headers={"User-Agent": "Mozilla/5.0 python-decoders-benchmarks"},
+    )
+    with urllib.request.urlopen(request, timeout=60) as response, open(
+        outputPath, "wb"
+    ) as outFile:
+        while True:
+            chunk = response.read(1 << 16)
+            if not chunk:
+                break
+            outFile.write(chunk)
+
     print(f"Video downloaded to {outputPath}")
 
     return outputPath
+
+
+def getRunnerInfo() -> dict[str, Any]:
+    """Stable identifier of the runner so history per-runner can be tracked."""
+    runner = os.environ.get("RUNNER_NAME") or os.environ.get("BENCHMARK_RUNNER", "")
+    isCi = bool(os.environ.get("GITHUB_ACTIONS") or os.environ.get("CI"))
+
+    if not runner:
+        runner = ("ci-" if isCi else "local-") + platform.node()
+
+    commit = (
+        os.environ.get("GITHUB_SHA")
+        or os.environ.get("BENCHMARK_COMMIT")
+        or _gitShortSha()
+    )
+
+    return {
+        "runner": runner,
+        "isCi": isCi,
+        "os": f"{platform.system()} {platform.release()}",
+        "python": platform.python_version(),
+        "commit": commit,
+        "timestampUtc": datetime.now(timezone.utc).strftime("%Y-%m-%dT%H:%M:%SZ"),
+    }
+
+
+def _gitShortSha() -> str:
+    try:
+        sha = subprocess.check_output(
+            ["git", "rev-parse", "--short", "HEAD"],
+            stderr=subprocess.DEVNULL,
+            text=True,
+        ).strip()
+        return sha
+    except Exception:
+        return ""
 
 
 def getSystemInfo() -> dict[str, Any]:
@@ -95,14 +147,73 @@ class Decoder:
     videoInfo: Any | None = None
 
 
+def _aggregateIterations(iterations: list[dict[str, Any]]) -> dict[str, Any]:
+    """Reduce per-iteration decoder runs to summary stats.
+
+    Each iteration carries fps / frameCount / elapsedTime / optional error.
+    Successful iterations contribute to fps stats; if every iteration errored
+    we keep the first error so the consumer still sees a failure.
+    """
+    successful = [it for it in iterations if "error" not in it and it.get("fps", 0) > 0]
+    fpsValues = [it["fps"] for it in successful]
+    frameCounts = [it.get("frameCount", 0) for it in successful]
+
+    if not successful:
+        firstError = next((it["error"] for it in iterations if "error" in it), "no successful runs")
+        return {
+            "error": firstError,
+            "frameCount": 0,
+            "elapsedTime": 0,
+            "fps": 0,
+            "iterations": iterations,
+            "runs": len(iterations),
+            "successfulRuns": 0,
+        }
+
+    medianFps = statistics.median(fpsValues)
+    meanFps = statistics.fmean(fpsValues)
+    stdFps = statistics.pstdev(fpsValues) if len(fpsValues) > 1 else 0.0
+    cv = (stdFps / meanFps) if meanFps > 0 else 0.0
+
+    return {
+        "frameCount": frameCounts[0] if frameCounts else 0,
+        "elapsedTime": statistics.fmean([it["elapsedTime"] for it in successful]),
+        # `fps` is the headline number used by plots & older history rows: use median
+        "fps": medianFps,
+        "fpsMedian": medianFps,
+        "fpsMean": meanFps,
+        "fpsStd": stdFps,
+        "fpsMin": min(fpsValues),
+        "fpsMax": max(fpsValues),
+        "fpsCv": cv,
+        "runs": len(iterations),
+        "successfulRuns": len(successful),
+        "iterations": iterations,
+    }
+
+
+def _runDecoderIteration(decoder: "Decoder", videoPath: str) -> dict[str, Any]:
+    decoderFct = decoder.decoder
+    if decoderFct.__code__.co_argcount == 1:
+        return decoderFct(videoPath)
+    return decoderFct(videoPath, decoder.videoInfo)
+
+
 def runBenchmark(
-    videoPath: str, coolingPeriod: int = 3, systemInfo: dict = {}
+    videoPath: str,
+    coolingPeriod: int = 3,
+    systemInfo: dict = {},
+    runs: int = 3,
+    warmup: int = 1,
 ) -> dict[str, Any]:
     """Run benchmark on all decoders and return the results.
 
     Args:
         videoPath: Path to the video file to benchmark
         coolingPeriod: Time in seconds to wait between decoder tests
+        runs: Number of timed iterations per decoder (median is reported)
+        warmup: Untimed warmup iterations to prime the OS page cache and lazy
+            initialisation paths inside each library
     """
     print("Getting video information...")
     videoInfo = getVideoInfo(videoPath)
@@ -166,14 +277,43 @@ def runBenchmark(
     decodingResults: dict[str, Any] = {}
     for i, decoder in enumerate(decoders):
         print(
-            lightcyan(f"\n({i + 1}/{len(decoders)}) Running {decoder.name} decoder...")
+            lightcyan(
+                f"\n({i + 1}/{len(decoders)}) Running {decoder.name} decoder "
+                f"[{warmup} warmup + {runs} timed]..."
+            )
         )
-        decoderFCT = decoder.decoder
-        decodingResults[decoder.name] = (
-            decoderFCT(videoPath)
-            if decoderFCT.__code__.co_argcount == 1
-            else decoderFCT(videoPath, decoder.videoInfo)
-        )
+
+        for w in range(warmup):
+            try:
+                _runDecoderIteration(decoder, videoPath)
+            except Exception as warmupErr:
+                # Warmup failures are expected for unsupported backends; the timed
+                # runs below will record the same error in the aggregated result.
+                print(f"  warmup {w + 1}/{warmup} failed: {warmupErr}")
+            time.sleep(min(1, decoder.cooling))
+
+        iterations: list[dict[str, Any]] = []
+        for r in range(runs):
+            try:
+                result = _runDecoderIteration(decoder, videoPath)
+            except Exception as runErr:
+                result = {
+                    "error": str(runErr),
+                    "frameCount": 0,
+                    "elapsedTime": 0,
+                    "fps": 0,
+                }
+            iterations.append(result)
+            print(
+                f"  run {r + 1}/{runs}: "
+                f"{result.get('fps', 0):.2f} fps "
+                f"({result.get('frameCount', 0)} frames)"
+                + (f" ERROR: {result['error']}" if "error" in result else "")
+            )
+            if r < runs - 1:
+                time.sleep(decoder.cooling)
+
+        decodingResults[decoder.name] = _aggregateIterations(iterations)
         time.sleep(decoder.cooling)
 
     print(lightcyan("\nBenchmark completed."))
@@ -182,6 +322,8 @@ def runBenchmark(
         "videoPath": videoPath,
         "videoInfo": videoInfo,
         "systemInfo": systemInfo,
+        "runnerInfo": getRunnerInfo(),
+        "config": {"runs": runs, "warmup": warmup, "coolingPeriod": coolingPeriod},
         "decoders": decodingResults,
     }
 
@@ -373,15 +515,25 @@ def printResultsSummary(results: dict[str, Any]) -> None:
     validDecoders = {}
     for decoderName, data in results.get("decoders", {}).items():
         if "error" in data:
-            print(f"  {decoderName.ljust(10)}: ERROR - {data['error']}")
+            print(f"  {decoderName.ljust(26)}: ERROR - {data['error']}")
         elif "fps" in data:
+            median = data.get("fpsMedian", data["fps"])
+            std = data.get("fpsStd", 0.0)
+            cv = data.get("fpsCv", 0.0) * 100
+            mn = data.get("fpsMin", median)
+            mx = data.get("fpsMax", median)
+            runs = data.get("successfulRuns", 1)
+            total = data.get("runs", 1)
             print(
-                f"  {decoderName.ljust(10)}: {data['fps']:.2f} fps ({data.get('elapsedTime', 0):.2f} seconds)"
+                f"  {decoderName.ljust(26)}: "
+                f"{median:6.2f} fps  (mean={data.get('fpsMean', median):6.2f} "
+                f"std={std:5.2f} cv={cv:4.1f}% "
+                f"min={mn:6.2f} max={mx:6.2f}  {runs}/{total} runs)"
             )
             if data["fps"] > 0:
                 validDecoders[decoderName] = data
         else:
-            print(f"  {decoderName.ljust(10)}: No FPS data available.")
+            print(f"  {decoderName.ljust(26)}: No FPS data available.")
 
     if validDecoders:
         fastestDecoder = max(
@@ -453,21 +605,48 @@ def main() -> None:
         required=False,
         help="Use a custom input video file (overrides default videos).",
     )
+    parser.add_argument(
+        "--runs",
+        type=int,
+        default=int(os.environ.get("BENCHMARK_RUNS", "3")),
+        help="Number of timed iterations per decoder (median is reported). Default 3.",
+    )
+    parser.add_argument(
+        "--warmup",
+        type=int,
+        default=int(os.environ.get("BENCHMARK_WARMUP", "1")),
+        help="Number of untimed warmup iterations before the timed runs. Default 1.",
+    )
+    parser.add_argument(
+        "--cooling",
+        type=int,
+        default=int(os.environ.get("BENCHMARK_COOLING", "3")),
+        help="Seconds to wait between iterations and decoders. Default 3.",
+    )
+    parser.add_argument(
+        "--no-history",
+        action="store_true",
+        help="Skip appending results to history/.",
+    )
 
     arguments = parser.parse_args()
 
+    # Originals (commondatastorage.googleapis.com / gtv-videos-bucket) started
+    # returning HTTP 403 in early 2026 regardless of User-Agent — the bucket is
+    # gated. test-videos.co.uk is the most stable public mirror that still
+    # serves direct mp4 downloads without a CDN gate.
     defaultVideos = [
         {
-            "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ElephantsDream.mp4",
-            "path": os.path.join("videos", "ElephantsDream.mp4"),
-            "results": "1280x720_results.json",
-            "diagram": "1280x720_diagram.png",
+            "url": "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/720/Big_Buck_Bunny_720_10s_30MB.mp4",
+            "path": os.path.join("videos", "BigBuckBunny_720p.mp4"),
+            "results": "720p_results.json",
+            "diagram": "720p_diagram.png",
         },
         {
-            "url": "http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/VolkswagenGTIReview.mp4",
-            "path": os.path.join("videos", "VolkswagenGTIReview.mp4"),
-            "results": "480x270_results.json",
-            "diagram": "480x270_diagram.png",
+            "url": "https://test-videos.co.uk/vids/bigbuckbunny/mp4/h264/360/Big_Buck_Bunny_360_10s_30MB.mp4",
+            "path": os.path.join("videos", "BigBuckBunny_360p.mp4"),
+            "results": "360p_results.json",
+            "diagram": "360p_diagram.png",
         },
     ]
 
@@ -518,7 +697,11 @@ def main() -> None:
         )
 
         results = runBenchmark(
-            videoPath=videoPath, coolingPeriod=3, systemInfo=systemInfo
+            videoPath=videoPath,
+            coolingPeriod=arguments.cooling,
+            systemInfo=systemInfo,
+            runs=arguments.runs,
+            warmup=arguments.warmup,
         )
 
         printResultsSummary(results)
@@ -528,6 +711,17 @@ def main() -> None:
         generate_frame_count_markdown(results, markdownPath)
 
         createPerformanceDiagram(results, diagramPath)
+
+        if not arguments.no_history:
+            from src.history import appendHistory, plotHistoryTrends
+
+            resolutionKey = os.path.splitext(os.path.basename(resultsPath))[0].replace(
+                "_results", ""
+            )
+            historyPath = os.path.join("history", f"{resolutionKey}_history.json")
+            trendPath = os.path.join("history", f"{resolutionKey}_trend.png")
+            appendHistory(results, historyPath, resolutionKey)
+            plotHistoryTrends(historyPath, trendPath, resolutionKey)
 
 
 if __name__ == "__main__":

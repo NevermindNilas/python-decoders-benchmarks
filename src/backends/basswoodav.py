@@ -1,11 +1,19 @@
-import bv
 import time
 from typing import Any
+
+try:
+    import bv  # type: ignore
+except ImportError:
+    bv = None
+    print("BasswoodAV error: not installed (no wheel for this Python yet).")
 
 
 def decodeWithBasswoodAV(videoPath: str) -> dict[str, Any]:
     """Decode video using BasswoodAV and return the frame count."""
     try:
+        if bv is None:
+            raise ImportError("bv module not available")
+
         print("Decoding with BasswoodAV...")
 
         container = bv.open(videoPath)
