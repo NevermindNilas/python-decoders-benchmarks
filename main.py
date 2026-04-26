@@ -25,10 +25,6 @@ from src.backends.torchaudio import decodeWithTorchaudio
 from src.backends.ffmpegcv import decodeWithFFMPEGCV_Block, decodeWithFFMPEGCV_NoBlock
 from src.backends.decord import decodeWithDecord
 from src.backends.deffcode import decodeWithDeffcode
-from src.backends.maxTheoretical import (
-    decodeWithMaxTheoreticalRGB,
-    decodeWithMaxTheoreticalYUV420,
-)
 from src.backends.videoreaderrs import (
     decodeWithVideoReaderRS,
     decodeWithVideoReaderRSFast,
@@ -260,16 +256,6 @@ def runBenchmark(
             videoInfo=videoInfo,
         ),
         Decoder(name="Deffcode", decoder=decodeWithDeffcode, cooling=coolingPeriod),
-        Decoder(
-            name="Max Theoretical RGB24",
-            decoder=decodeWithMaxTheoreticalRGB,
-            cooling=coolingPeriod,
-        ),
-        Decoder(
-            name="Max Theoretical YUV420",
-            decoder=decodeWithMaxTheoreticalYUV420,
-            cooling=coolingPeriod,
-        ),
     ]
 
     decodingResults: dict[str, Any] = {}

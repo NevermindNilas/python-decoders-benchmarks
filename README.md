@@ -24,7 +24,6 @@ This project benchmarks the performance (Frames Per Second - FPS) of various Pyt
     *   [DeffCode](https://abhitronix.github.io/deffcode/latest/)
     *   [Video-Reader-RS](https://github.com/gcanat/video_reader-rs) ( Base run uses pure rgb24 decode afaik whilst the "YuvToRGB" run decodes in yuv420p and then converts it to rgb24 on the rust side to speed things up, altho' I am not entirely sure how this would hold up if the input was in other color formats say yuv422, yuv444 or rgb48 )
     *   [FFmpeg-Python](https://github.com/kkroening/ffmpeg-python) ( Altho' in theory it serves the same purpose as the ffmpeg-subprocess run, I still decided to add it to see if it adds any extra overhead over your run of the mill ffmpeg subprocess pipe )
-    *   **Max Theoretical**: Baseline performance using raw `ffmpeg` subprocess ([`decodeWithMaxTheoretical`](src/backends/maxTheoretical.py)) to estimate maximum hardware FPS with minimal overhead for both RGB24 and YUV420p
     *   [Nelux](https://github.com/NevermindNilas/Nelux) ( formerly CeLux. A high-performance decoder that uses the latest FFmpeg features and PyTorch for async decoding. Wheels published via GitHub releases. )
 
 
