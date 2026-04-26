@@ -36,10 +36,22 @@ jobs:
       with:
         python-version: '3.14'
 
-    - name: Install FFmpeg
+    - name: Install FFmpeg 8.1 (BtbN shared build)
+      env:
+        FFMPEG_BUILD: 'ffmpeg-n8.1-latest-linux64-gpl-shared-8.1'
       run: |
-        sudo apt-get update
-        sudo apt-get install -y ffmpeg
+        # Nelux's _nelux.so links against libavcodec.so.62 / libavformat.so.62
+        # (ffmpeg 8.x). Ubuntu 24.04's apt ships ffmpeg 6.x, so we pull the
+        # BtbN shared build instead — it carries the binary plus the
+        # matching libav*/libsw* shared objects.
+        sudo mkdir -p /opt/ffmpeg
+        curl -fsSL "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/${FFMPEG_BUILD}.tar.xz" \
+          | sudo tar -xJf - -C /opt/ffmpeg --strip-components=1
+        echo "/opt/ffmpeg/lib" | sudo tee /etc/ld.so.conf.d/zz-ffmpeg.conf >/dev/null
+        sudo ldconfig
+        echo "/opt/ffmpeg/bin" >> "$GITHUB_PATH"
+        echo "LD_LIBRARY_PATH=/opt/ffmpeg/lib:${LD_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
+        /opt/ffmpeg/bin/ffmpeg -version | head -1
 
     - name: Install dependencies
       run: |
