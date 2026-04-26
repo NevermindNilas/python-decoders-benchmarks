@@ -22,11 +22,10 @@ This project benchmarks the performance (Frames Per Second - FPS) of various Pyt
     *   [Decord](https://github.com/dmlc/decord) ( not recommended due to [OOM Issues](https://github.com/dmlc/decord/issues/323))
     *   [TorchAudio](https://pytorch.org/audio/stable/index.html) ( requires FFMPEG v6, I can't test it. )
     *   [DeffCode](https://abhitronix.github.io/deffcode/latest/)
-    *   [BasswoodAV](https://av.basswood-io.com/docs/stable/) ( pyav continutation )
     *   [Video-Reader-RS](https://github.com/gcanat/video_reader-rs) ( Base run uses pure rgb24 decode afaik whilst the "YuvToRGB" run decodes in yuv420p and then converts it to rgb24 on the rust side to speed things up, altho' I am not entirely sure how this would hold up if the input was in other color formats say yuv422, yuv444 or rgb48 )
     *   [FFmpeg-Python](https://github.com/kkroening/ffmpeg-python) ( Altho' in theory it serves the same purpose as the ffmpeg-subprocess run, I still decided to add it to see if it adds any extra overhead over your run of the mill ffmpeg subprocess pipe )
     *   **Max Theoretical**: Baseline performance using raw `ffmpeg` subprocess ([`decodeWithMaxTheoretical`](src/backends/maxTheoretical.py)) to estimate maximum hardware FPS with minimal overhead for both RGB24 and YUV420p
-    *   [Celux](https://github.com/Trentonom0r3/CeLux) ( A new decoder that uses the latest FFmpeg features as well as pytorch to provide high performance async decoding. It is still in early development but shows promising results. )
+    *   [Nelux](https://github.com/NevermindNilas/Nelux) ( formerly CeLux. A high-performance decoder that uses the latest FFmpeg features and PyTorch for async decoding. Wheels published via GitHub releases. )
 
 
 ## Benchmark Results Example

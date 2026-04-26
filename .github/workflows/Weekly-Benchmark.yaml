@@ -41,17 +41,22 @@ jobs:
         sudo apt-get update
         sudo apt-get install -y ffmpeg
 
-    - name: Install core dependencies
+    - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
         pip install -r requirements.txt
 
-    - name: Install optional dependencies (best-effort)
-      continue-on-error: true
+    - name: Install Nelux (GitHub release wheel)
+      env:
+        NELUX_VERSION: '0.9.2'
       run: |
-        # basswood-av / celux currently lack 3.14 wheels — try anyway, the
-        # benchmark backends skip cleanly when the import fails.
-        pip install --only-binary=:all: -r requirements-optional.txt || true
+        # Nelux ships wheels via GitHub releases, not PyPI. Pick the wheel
+        # matching the active Python tag (cp313 / cp314) for manylinux x86_64.
+        py_tag=$(python -c "import sys; print(f'cp{sys.version_info.major}{sys.version_info.minor}')")
+        wheel="nelux-${NELUX_VERSION}-${py_tag}-${py_tag}-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
+        url="https://github.com/NevermindNilas/Nelux/releases/download/v${NELUX_VERSION}/${wheel}"
+        echo "Installing ${url}"
+        pip install "${url}"
 
     - name: Run benchmark
       run: python main.py --runs "${BENCHMARK_RUNS}" --warmup "${BENCHMARK_WARMUP}"

@@ -29,7 +29,6 @@ from src.backends.maxTheoretical import (
     decodeWithMaxTheoreticalRGB,
     decodeWithMaxTheoreticalYUV420,
 )
-from src.backends.basswoodav import decodeWithBasswoodAV
 from src.backends.videoreaderrs import (
     decodeWithVideoReaderRS,
     decodeWithVideoReaderRSFast,
@@ -219,9 +218,8 @@ def runBenchmark(
     videoInfo = getVideoInfo(videoPath)
 
     decoders: list[Decoder] = [
-        Decoder(name="CeLux", decoder=decodeWithCeLux, cooling=coolingPeriod),
+        Decoder(name="Nelux", decoder=decodeWithCeLux, cooling=coolingPeriod),
         Decoder(name="PyAV", decoder=decodeWithPyAV, cooling=coolingPeriod),
-        Decoder(name="BasswoodAV", decoder=decodeWithBasswoodAV, cooling=coolingPeriod),
         Decoder(name="OpenCV", decoder=decodeWithOpenCV, cooling=coolingPeriod),
         Decoder(name="torchaudio", decoder=decodeWithTorchaudio, cooling=coolingPeriod),
         Decoder(name="TorchCodec", decoder=decodeWithTorchCodec, cooling=coolingPeriod),

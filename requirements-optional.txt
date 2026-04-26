@@ -1,5 +1,0 @@
-# Decoders without Python 3.14 wheels at the time of writing.
-# Install best-effort; the corresponding backends fall back gracefully when
-# the import fails.
-basswood-av  # latest wheels: cp310-cp313 (no 3.14 yet)
-celux        # latest wheels: cp313 only, Windows-only

@@ -1,5 +1,4 @@
-# Core decoders — wheels available for Python 3.14.
-# Optional decoders (no 3.14 wheels yet) live in requirements-optional.txt.
+# All decoders — Python 3.14 compatible.
 torch
 opencv-python
 numpy
@@ -15,3 +14,6 @@ deffcode
 video-reader-rs
 torchcodec
 ffmpeg-python
+# Nelux (formerly CeLux) is published via GitHub releases, not PyPI.
+# Pinned wheel URL — pip auto-selects from URL pattern wouldn't work, so
+# the workflow installs the matching wheel for the target Python explicitly.

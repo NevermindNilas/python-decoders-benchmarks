@@ -2,17 +2,24 @@ import time
 from typing import Any
 
 try:
-    from celux import VideoReader
+    from nelux import VideoReader
 except ImportError:
-    print("CeLux error: Not supported on this platform or missing dependencies.")
+    try:
+        from celux import VideoReader  # legacy package name
+    except ImportError:
+        VideoReader = None
+        print("Nelux error: Not supported on this platform or missing dependencies.")
 
 
 def decodeWithCeLux(videoPath: str) -> dict[str, Any]:
     """
-    Decode video using CeLux and return the frame count, elapsed time, and fps.
+    Decode video using Nelux (formerly CeLux) and return the frame count,
+    elapsed time, and fps.
     """
     try:
-        print("Decoding with CeLux...")
+        if VideoReader is None:
+            raise ImportError("nelux/celux module not available")
+        print("Decoding with Nelux...")
 
         reader = VideoReader(videoPath)
         frameCount = 0
@@ -24,7 +31,7 @@ def decodeWithCeLux(videoPath: str) -> dict[str, Any]:
         endTime = time.time()
 
         elapsedTime = endTime - startTime
-        print(f"CeLux: Processed {frameCount} frames in {elapsedTime:.2f} seconds")
+        print(f"Nelux: Processed {frameCount} frames in {elapsedTime:.2f} seconds")
 
         return {
             "frameCount": frameCount,
@@ -32,7 +39,7 @@ def decodeWithCeLux(videoPath: str) -> dict[str, Any]:
             "fps": frameCount / elapsedTime if elapsedTime > 0 else 0,
         }
     except Exception as e:
-        print(f"Error in CeLux decoder: {str(e)}")
+        print(f"Error in Nelux decoder: {str(e)}")
         return {
             "error": str(e),
             "frameCount": 0,
