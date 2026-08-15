@@ -2111,6 +2111,190 @@
           "successfulRuns": 3
         }
       }
+    },
+    {
+      "timestampUtc": "2026-08-15T00:20:34Z",
+      "runner": "GitHub Actions 1000007871",
+      "commit": "d5e66e622b74bed96c08afa3a03b65e59a53bb22",
+      "isCi": true,
+      "os": "Linux 6.17.0-1022-azure",
+      "python": "3.14.7",
+      "config": {
+        "runs": 3,
+        "warmup": 1,
+        "coolingPeriod": 3
+      },
+      "videoInfo": {
+        "width": 1280,
+        "height": 720,
+        "frameCount": 300,
+        "fps": 30.0,
+        "durationSeconds": 10.0
+      },
+      "decoders": {
+        "Nelux": {
+          "fps": 0,
+          "frameCount": 0,
+          "elapsedTime": 0,
+          "runs": 3,
+          "successfulRuns": 0,
+          "error": "nelux/celux module not available"
+        },
+        "PyAV": {
+          "fps": 77.72338742918107,
+          "fpsMedian": 77.72338742918107,
+          "fpsMean": 78.0759978822379,
+          "fpsStd": 0.567006989100047,
+          "fpsMin": 77.62860864043365,
+          "fpsMax": 78.87599757709896,
+          "fpsCv": 0.00726224453711452,
+          "frameCount": 300,
+          "elapsedTime": 3.8426117102305093,
+          "runs": 3,
+          "successfulRuns": 3
+        },
+        "OpenCV": {
+          "fps": 142.47135578809923,
+          "fpsMedian": 142.47135578809923,
+          "fpsMean": 142.52561867680092,
+          "fpsStd": 0.6726007419940445,
+          "fpsMin": 141.73032730326628,
+          "fpsMax": 143.37517293903727,
+          "fpsCv": 0.0047191567960793886,
+          "frameCount": 300,
+          "elapsedTime": 2.104931592941284,
+          "runs": 3,
+          "successfulRuns": 3
+        },
+        "torchaudio": {
+          "fps": 0,
+          "frameCount": 0,
+          "elapsedTime": 0,
+          "runs": 3,
+          "successfulRuns": 0,
+          "error": "module 'torchaudio' has no attribute 'io'"
+        },
+        "TorchCodec": {
+          "fps": 78.10415926333414,
+          "fpsMedian": 78.10415926333414,
+          "fpsMean": 78.12455486637349,
+          "fpsStd": 0.18628342182795624,
+          "fpsMin": 77.90728775982073,
+          "fpsMax": 78.36221757596557,
+          "fpsCv": 0.002384441385254365,
+          "frameCount": 300,
+          "elapsedTime": 3.8400437037150064,
+          "runs": 3,
+          "successfulRuns": 3
+        },
+        "Decord": {
+          "fps": 146.47773471640883,
+          "fpsMedian": 146.47773471640883,
+          "fpsMean": 146.30465905096665,
+          "fpsStd": 0.905188709822643,
+          "fpsMin": 145.11967526549716,
+          "fpsMax": 147.316567170994,
+          "fpsCv": 0.006187012195608287,
+          "frameCount": 300,
+          "elapsedTime": 2.0505943298339844,
+          "runs": 3,
+          "successfulRuns": 3
+        },
+        "VideoReaderRS": {
+          "fps": 0,
+          "frameCount": 0,
+          "elapsedTime": 0,
+          "runs": 3,
+          "successfulRuns": 0,
+          "error": "name 'PyVideoReader' is not defined"
+        },
+        "VideoReaderRS YUV420toRGB": {
+          "fps": 0,
+          "frameCount": 0,
+          "elapsedTime": 0,
+          "runs": 3,
+          "successfulRuns": 0,
+          "error": "name 'PyVideoReader' is not defined"
+        },
+        "FFmpeg-Subprocess": {
+          "fps": 134.58758185293624,
+          "fpsMedian": 134.58758185293624,
+          "fpsMean": 134.3534992826901,
+          "fpsStd": 0.39697990786453186,
+          "fpsMin": 133.79453766130447,
+          "fpsMax": 134.6783783338296,
+          "fpsCv": 0.0029547418562523298,
+          "frameCount": 300,
+          "elapsedTime": 2.2329349517822266,
+          "runs": 3,
+          "successfulRuns": 3
+        },
+        "FFMPEGCV (Block)": {
+          "fps": 133.55793045428695,
+          "fpsMedian": 133.55793045428695,
+          "fpsMean": 133.70088562664344,
+          "fpsStd": 0.4290123161768085,
+          "fpsMin": 133.26172614486688,
+          "fpsMax": 134.2830002807765,
+          "fpsCv": 0.0032087470039264755,
+          "frameCount": 300,
+          "elapsedTime": 2.2438376744588218,
+          "runs": 3,
+          "successfulRuns": 3
+        },
+        "FFmpegCV-NoBlock": {
+          "fps": 122.46029842059855,
+          "fpsMedian": 122.46029842059855,
+          "fpsMean": 122.02115249227893,
+          "fpsStd": 0.6787040043956459,
+          "fpsMin": 121.06244366198607,
+          "fpsMax": 122.54071539425216,
+          "fpsCv": 0.005562183199659517,
+          "frameCount": 300,
+          "elapsedTime": 2.4586664835611978,
+          "runs": 3,
+          "successfulRuns": 3
+        },
+        "Imageio-ffmpeg": {
+          "fps": 146.95451504744213,
+          "fpsMedian": 146.95451504744213,
+          "fpsMean": 144.62286026209333,
+          "fpsStd": 3.8773209526766115,
+          "fpsMin": 139.15901400876143,
+          "fpsMax": 147.75505173007645,
+          "fpsCv": 0.026809876015796687,
+          "frameCount": 301,
+          "elapsedTime": 2.0828004678090415,
+          "runs": 3,
+          "successfulRuns": 3
+        },
+        "FFmpeg-python": {
+          "fps": 133.95419188106086,
+          "fpsMedian": 133.95419188106086,
+          "fpsMean": 134.14241383754754,
+          "fpsStd": 0.2932022010747008,
+          "fpsMin": 133.9165550244123,
+          "fpsMax": 134.55649460716938,
+          "fpsCv": 0.0021857531312190473,
+          "frameCount": 300,
+          "elapsedTime": 2.2364397843678794,
+          "runs": 3,
+          "successfulRuns": 3
+        },
+        "Deffcode": {
+          "fps": 134.54905594726384,
+          "fpsMedian": 134.54905594726384,
+          "fpsMean": 134.5505568707534,
+          "fpsStd": 0.48195469811937586,
+          "fpsMin": 133.9610372189226,
+          "fpsMax": 135.14157744607374,
+          "fpsCv": 0.0035819598917181143,
+          "frameCount": 300,
+          "elapsedTime": 2.2296737829844155,
+          "runs": 3,
+          "successfulRuns": 3
+        }
+      }
     }
   ]
 }
