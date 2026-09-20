@@ -5,7 +5,6 @@ import statistics
 import subprocess
 import time
 import urllib.request
-import traceback
 import platform
 import hashlib
 from importlib.metadata import version, PackageNotFoundError

@@ -20,8 +20,8 @@ a list of run records:
       ]
     }
 
-The trend chart slices that file by runner so a single library's evolution
-is comparable only against runs from the same hardware.
+The trend chart groups hosted runner instances by pool and recorded CPU cohort.
+Older hosted records form an explicitly labelled group with unknown hardware.
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ from typing import Any
 
 import matplotlib.dates as mdates
 import matplotlib.pyplot as plt
-from datetime import datetime
+from datetime import datetime, timedelta
 
 
 _HISTORY_KEYS_TO_KEEP = (
@@ -150,11 +150,13 @@ def plotHistoryTrends(historyPath: str, outputPath: str, resolution: str) -> Non
         print("No plottable points in history — skipping trend plot.")
         return
 
-    # One subplot per runner so libraries on different hardware aren't mixed.
+    # One subplot per cohort; old ephemeral instances are one legacy cohort.
     runners = sorted({runner for runner, _ in series.keys()})
     fig, axes = plt.subplots(
-        len(runners), 1, figsize=(14, 5 * len(runners)), squeeze=False
+        len(runners), 1, figsize=(14, 5 * len(runners)), squeeze=False, sharex=True
     )
+    dates = [when for points in series.values() for when, _ in points]
+    padding = max(timedelta(days=1), (max(dates) - min(dates)) * 0.03)
 
     colors = {lib: plt.get_cmap("tab20")(i % 20) for i, lib in enumerate(libraries)}
     for axIdx, runner in enumerate(runners):
@@ -174,7 +176,8 @@ def plotHistoryTrends(historyPath: str, outputPath: str, resolution: str) -> Non
         ax.grid(axis="y", linestyle="--", alpha=0.5)
         ax.xaxis.set_major_formatter(mdates.DateFormatter("%Y-%m-%d"))
         ax.tick_params(axis="x", rotation=30)
-        ax.legend(loc="best", fontsize=8, ncol=2)
+        ax.set_xlim(min(dates) - padding, max(dates) + padding)
+        ax.legend(loc="center left", bbox_to_anchor=(1.01, 0.5), fontsize=8)
 
     fig.suptitle(f"Decoder performance over time ({resolution})\nHosted runner measurements include machine-to-machine variation; gaps mean unavailable", fontsize=12)
     fig.tight_layout(rect=[0, 0, 1, 0.97])

@@ -32,8 +32,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v5
-        with:
-          ref: ${{ github.ref }}
       - uses: ./.github/actions/setup-benchmark
       - name: Test reporting
         run: python -m unittest discover -s tests -v
