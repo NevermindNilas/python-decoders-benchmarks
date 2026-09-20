@@ -19,6 +19,18 @@ jobs:
           python-version: '3.14'
       - run: pip install matplotlib packaging
       - run: python -m unittest discover -s tests -v
+      - name: Regenerate historical charts from recorded measurements
+        run: |
+          python - <<'PY'
+          from src.history import plotHistoryTrends
+          for resolution in ('360p', '720p'):
+              plotHistoryTrends(f'history/{resolution}_history.json', f'history/{resolution}_trend.png', resolution)
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: corrected-historical-charts
+          path: history/*_trend.png
+          if-no-files-found: error
 
   nelux:
     runs-on: ubuntu-24.04

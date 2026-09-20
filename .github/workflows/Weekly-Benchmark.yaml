@@ -14,113 +14,103 @@ on:
         required: false
         default: '1'
 
+concurrency:
+  group: benchmark-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   build-and-release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     permissions:
       contents: write
-
     env:
+      GH_TOKEN: ${{ github.token }}
       BENCHMARK_RUNS: ${{ github.event.inputs.runs || '3' }}
       BENCHMARK_WARMUP: ${{ github.event.inputs.warmup || '1' }}
-      BENCHMARK_RUNNER: ubuntu-latest-github-hosted
+      BENCHMARK_RUNNER: ubuntu-24.04-github-hosted
+      MPLBACKEND: Agg
 
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v5
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-
-    - name: Set up Python
-      uses: actions/setup-python@v6
-      with:
-        python-version: '3.14'
-
-    - name: Install FFmpeg 8.1 (BtbN shared build)
-      env:
-        FFMPEG_BUILD: 'ffmpeg-n8.1-latest-linux64-gpl-shared-8.1'
-      run: |
-        # Nelux's _nelux.so links against libavcodec.so.62 / libavformat.so.62
-        # (ffmpeg 8.x). Ubuntu 24.04's apt ships ffmpeg 6.x, so we pull the
-        # BtbN shared build instead — it carries the binary plus the
-        # matching libav*/libsw* shared objects.
-        sudo mkdir -p /opt/ffmpeg
-        curl -fsSL "https://github.com/BtbN/FFmpeg-Builds/releases/download/latest/${FFMPEG_BUILD}.tar.xz" \
-          | sudo tar -xJf - -C /opt/ffmpeg --strip-components=1
-        echo "/opt/ffmpeg/lib" | sudo tee /etc/ld.so.conf.d/zz-ffmpeg.conf >/dev/null
-        sudo ldconfig
-        echo "/opt/ffmpeg/bin" >> "$GITHUB_PATH"
-        echo "LD_LIBRARY_PATH=/opt/ffmpeg/lib:${LD_LIBRARY_PATH:-}" >> "$GITHUB_ENV"
-        /opt/ffmpeg/bin/ffmpeg -version | head -1
-
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-
-    - name: Install Nelux (GitHub release wheel)
-      env:
-        NELUX_VERSION: '0.9.2'
-      run: |
-        # Nelux ships wheels via GitHub releases, not PyPI. Pick the wheel
-        # matching the active Python tag (cp313 / cp314) for manylinux x86_64.
-        py_tag=$(python -c "import sys; print(f'cp{sys.version_info.major}{sys.version_info.minor}')")
-        wheel="nelux-${NELUX_VERSION}-${py_tag}-${py_tag}-manylinux_2_27_x86_64.manylinux_2_28_x86_64.whl"
-        url="https://github.com/NevermindNilas/Nelux/releases/download/v${NELUX_VERSION}/${wheel}"
-        echo "Installing ${url}"
-        pip install "${url}"
-
-    - name: Run benchmark
-      run: python main.py --runs "${BENCHMARK_RUNS}" --warmup "${BENCHMARK_WARMUP}"
-
-    - name: Get current date
-      id: date
-      run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
-
-    - name: Commit updated history
-      run: |
-        git config user.name "github-actions[bot]"
-        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-        git add history/ || true
-        if git diff --cached --quiet; then
-          echo "No history changes to commit."
-        else
-          git commit -m "chore(benchmark): update history ${{ steps.date.outputs.date }}"
-          git push
-        fi
-
-    - name: Create Release and Upload Assets
-      uses: softprops/action-gh-release@v2
-      with:
-        tag_name: benchmark-${{ steps.date.outputs.date }}
-        name: Benchmark Results ${{ steps.date.outputs.date }}
-        body: |
-          Biweekly benchmark results generated on ${{ steps.date.outputs.date }}.
-
-          Runner: `${{ env.BENCHMARK_RUNNER }}`
-          Iterations per decoder: `${{ env.BENCHMARK_RUNS }}` timed + `${{ env.BENCHMARK_WARMUP }}` warmup (median FPS reported).
-
-          **Performance Charts**
-
-          ***360p Benchmark:***
-          ![360p Bar](https://github.com/${{ github.repository }}/releases/download/benchmark-${{ steps.date.outputs.date }}/360p_diagram.png)
-          ![360p Trend](https://github.com/${{ github.repository }}/releases/download/benchmark-${{ steps.date.outputs.date }}/360p_trend.png)
-
-          ***720p Benchmark:***
-          ![720p Bar](https://github.com/${{ github.repository }}/releases/download/benchmark-${{ steps.date.outputs.date }}/720p_diagram.png)
-          ![720p Trend](https://github.com/${{ github.repository }}/releases/download/benchmark-${{ steps.date.outputs.date }}/720p_trend.png)
-
-          See attached `.json` files for detailed metrics and history.
-        files: |
-          360p_results.json
-          720p_results.json
-          360p_diagram.png
-          720p_diagram.png
-          history/360p_history.json
-          history/720p_history.json
-          history/360p_trend.png
-          history/720p_trend.png
-        draft: false
-        fail_on_unmatched_files: false
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - uses: actions/checkout@v5
+        with:
+          ref: ${{ github.ref }}
+      - uses: ./.github/actions/setup-benchmark
+      - name: Test reporting
+        run: python -m unittest discover -s tests -v
+      - name: Remove previous generated charts
+        run: rm -f 360p_results.json 720p_results.json 360p_diagram.png 720p_diagram.png history/360p_trend.png history/720p_trend.png
+      - name: Run benchmark
+        run: python main.py --runs "${BENCHMARK_RUNS}" --warmup "${BENCHMARK_WARMUP}"
+      - name: Validate measurements before publication
+        run: python -m src.validate_results
+      - name: Prepare release notes
+        id: release
+        run: |
+          date=$(date -u +'%Y-%m-%d')
+          tag="benchmark-${date}-${GITHUB_RUN_ID}"
+          echo "date=$date" >> "$GITHUB_OUTPUT"
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
+          {
+            echo "Biweekly performance measurements from ${date}."
+            echo
+            echo "Runner pool: ${BENCHMARK_RUNNER}. Hosted machines can vary; trends are observational, not controlled regression tests."
+            echo
+            echo "${BENCHMARK_RUNS} timed iterations + ${BENCHMARK_WARMUP} warmup; median FPS with min–max whiskers."
+            echo
+            echo "[Actions run](https://github.com/${GITHUB_REPOSITORY}/actions/runs/${GITHUB_RUN_ID}) · Source commit: ${GITHUB_SHA}"
+            for resolution in 360p 720p; do
+              echo
+              echo "### ${resolution}"
+              echo "![${resolution} performance](https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}/${resolution}_diagram.png)"
+              echo "![${resolution} history](https://github.com/${GITHUB_REPOSITORY}/releases/download/${tag}/${resolution}_trend.png)"
+              echo
+              cat "${resolution}_results_frame_count_comparison.md"
+            done
+            echo
+            echo "JSON attachments include package versions, input checksums, CPU details, per-iteration measurements and history. Historical hardware was not recorded; those runs are grouped separately. Unavailable decoders are listed explicitly and appear as gaps in trends."
+          } > release-notes.md
+          cat release-notes.md >> "$GITHUB_STEP_SUMMARY"
+      - name: Upload measurements and charts
+        uses: actions/upload-artifact@v4
+        with:
+          name: benchmark-${{ github.run_id }}-${{ github.run_attempt }}
+          if-no-files-found: error
+          path: |
+            360p_results.json
+            720p_results.json
+            360p_diagram.png
+            720p_diagram.png
+            *_results_frame_count_comparison.md
+            history/
+            release-notes.md
+      - name: Commit updated history
+        if: github.ref_name == github.event.repository.default_branch
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add history/
+          if ! git diff --cached --quiet; then
+            git commit -m "chore(benchmark): update history ${{ steps.release.outputs.date }}"
+            git pull --rebase origin "${GITHUB_REF_NAME}"
+            git push origin "HEAD:${GITHUB_REF_NAME}"
+          fi
+      - name: Publish release
+        if: github.ref_name == github.event.repository.default_branch
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.release.outputs.tag }}
+          name: Benchmark Results ${{ steps.release.outputs.date }}
+          target_commitish: ${{ github.sha }}
+          body_path: release-notes.md
+          fail_on_unmatched_files: true
+          files: |
+            360p_results.json
+            720p_results.json
+            360p_diagram.png
+            720p_diagram.png
+            360p_results_frame_count_comparison.md
+            720p_results_frame_count_comparison.md
+            history/360p_history.json
+            history/720p_history.json
+            history/360p_trend.png
+            history/720p_trend.png

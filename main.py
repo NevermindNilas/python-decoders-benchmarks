@@ -292,6 +292,9 @@ def runBenchmark(
         for r in range(runs):
             try:
                 result = _runDecoderIteration(decoder, videoPath)
+                expectedFrames = videoInfo.get("frameCount", 0)
+                if "error" not in result and expectedFrames and result.get("frameCount") != expectedFrames:
+                    result["error"] = f"Decoded {result.get('frameCount', 0)} of {expectedFrames} expected frames"
             except Exception as runErr:
                 result = {
                     "error": str(runErr),
