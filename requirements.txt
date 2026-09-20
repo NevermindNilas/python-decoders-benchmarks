@@ -14,6 +14,6 @@ deffcode
 video-reader-rs
 torchcodec
 ffmpeg-python
-# Nelux (formerly CeLux) is published via GitHub releases, not PyPI.
-# Pinned wheel URL — pip auto-selects from URL pattern wouldn't work, so
-# the workflow installs the matching wheel for the target Python explicitly.
+packaging
+# Actions installs the latest Nelux release wheel matching Python and torch ABI
+# via python -m src.install_nelux, then checks the native import.

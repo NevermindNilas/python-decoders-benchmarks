@@ -2,13 +2,19 @@ import time
 from typing import Any
 
 try:
+    import torch  # Nelux links to torch's native runtime; load it first.
     from nelux import VideoReader
-except ImportError:
+    _importError = None
+except (ImportError, OSError) as neluxError:
+    _importError = str(neluxError)
     try:
-        from celux import VideoReader  # legacy package name
-    except ImportError:
+        # Fall back only if Nelux is absent, never hide a broken Nelux install.
+        if not isinstance(neluxError, ModuleNotFoundError) or neluxError.name != "nelux":
+            raise neluxError
+        from celux import VideoReader
+    except (ImportError, OSError):
         VideoReader = None
-        print("Nelux error: Not supported on this platform or missing dependencies.")
+        print(f"Nelux import error: {_importError}")
 
 
 def decodeWithCeLux(videoPath: str) -> dict[str, Any]:
@@ -18,17 +24,16 @@ def decodeWithCeLux(videoPath: str) -> dict[str, Any]:
     """
     try:
         if VideoReader is None:
-            raise ImportError("nelux/celux module not available")
+            raise ImportError(_importError or "nelux/celux module not available")
         print("Decoding with Nelux...")
 
-        reader = VideoReader(videoPath)
         frameCount = 0
-
-        startTime = time.time()
-        for frame in reader:
-            # frame is a torch tensor (H, W, C) by default
-            frameCount += 1
-        endTime = time.time()
+        with VideoReader(videoPath, backend="numpy", decode_accelerator="cpu", force_8bit=True) as reader:
+            startTime = time.perf_counter()
+            for frame in reader:
+                # RGB24 numpy output, matching the CPU decoders.
+                frameCount += 1
+            endTime = time.perf_counter()
 
         elapsedTime = endTime - startTime
         print(f"Nelux: Processed {frameCount} frames in {elapsedTime:.2f} seconds")
