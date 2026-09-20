@@ -24,6 +24,8 @@ class ReportingTests(unittest.TestCase):
                 ax = plt.gcf().axes[0]
                 self.assertEqual([t.get_text() for t in ax.get_yticklabels()], ["PyAV", "Nelux"])
                 self.assertEqual([bar.get_width() for bar in ax.patches], [110])
+                self.assertEqual(ax.get_ylim(), (1.5, -0.5), "Leave space below the failed row")
+                self.assertGreater(ax.get_xlim()[1], 120, "Leave space for FPS labels beyond whiskers")
             plt.close("all")
 
     def test_chart_failure_propagates_instead_of_publishing_old_image(self):
