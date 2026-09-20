@@ -30,4 +30,3 @@ class ReportingTests(unittest.TestCase):
         with patch("matplotlib.figure.Figure.savefig", side_effect=OSError("disk error")):
             with self.assertRaises(OSError):
                 createPerformanceDiagram({"decoders": {"Nelux": {"fps": 20}}}, "unused.png")
-
