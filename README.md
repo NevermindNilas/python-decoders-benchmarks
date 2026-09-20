@@ -79,6 +79,8 @@ are immutable historical snapshots and are not rewritten by this fix.
 test on Ubuntu runners. It also regenerates historical trend charts as artifacts.
 Dispatch `BiWeekly Benchmark Run` on a working branch for full benchmark validation
 without publishing a release. No local script or benchmark execution is required.
+For chart-only changes, dispatch `Validate benchmark reporting` with a successful
+`benchmark_run_id` to re-render its artifacts on a runner without remeasuring FPS.
 
 
 ## Installation

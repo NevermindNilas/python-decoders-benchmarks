@@ -5,6 +5,11 @@ on:
     branches: ['codex/**']
   pull_request:
   workflow_dispatch:
+    inputs:
+      benchmark_run_id:
+        description: 'Optional successful benchmark run to re-render (no new measurements)'
+        required: false
+        default: ''
 
 permissions:
   contents: read
@@ -31,8 +36,33 @@ jobs:
           name: corrected-historical-charts
           path: history/*_trend.png
           if-no-files-found: error
+      - name: Re-render recorded benchmark artifacts
+        if: inputs.benchmark_run_id != '' && github.event_name == 'workflow_dispatch'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          BENCHMARK_RUN_ID: ${{ inputs.benchmark_run_id }}
+        run: |
+          gh run download "$BENCHMARK_RUN_ID" --repo "$GITHUB_REPOSITORY" --pattern "benchmark-${BENCHMARK_RUN_ID}-*" --dir benchmark-artifacts
+          python - <<'PY'
+          import json
+          from pathlib import Path
+          from src.reporting import createPerformanceDiagram
+          from src.history import plotHistoryTrends
+          for path in Path('benchmark-artifacts').rglob('*_results.json'):
+              createPerformanceDiagram(json.loads(path.read_text()), path.with_name(path.name.replace('_results.json', '_diagram.png')))
+          for path in Path('benchmark-artifacts').rglob('*_history.json'):
+              resolution = path.name.removesuffix('_history.json')
+              plotHistoryTrends(str(path), str(path.with_name(f'{resolution}_trend.png')), resolution)
+          PY
+      - uses: actions/upload-artifact@v4
+        if: inputs.benchmark_run_id != '' && github.event_name == 'workflow_dispatch'
+        with:
+          name: verified-chart-replay
+          path: benchmark-artifacts/
+          if-no-files-found: error
 
   nelux:
+    if: inputs.benchmark_run_id == '' || github.event_name != 'workflow_dispatch'
     runs-on: ubuntu-24.04
     env:
       GH_TOKEN: ${{ github.token }}
