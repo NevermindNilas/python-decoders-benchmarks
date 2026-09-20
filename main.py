@@ -5,11 +5,12 @@ import statistics
 import subprocess
 import time
 import urllib.request
-import traceback
 import platform
+import hashlib
+from importlib.metadata import version, PackageNotFoundError
 import psutil
 import cv2
-import matplotlib.pyplot as plt
+from src.reporting import createPerformanceDiagram, generate_frame_count_markdown
 
 from argparse import ArgumentParser
 from dataclasses import dataclass
@@ -73,7 +74,7 @@ def downloadVideo(url: str, outputPath: str) -> str:
 
 def getRunnerInfo() -> dict[str, Any]:
     """Stable identifier of the runner so history per-runner can be tracked."""
-    runner = os.environ.get("RUNNER_NAME") or os.environ.get("BENCHMARK_RUNNER", "")
+    runner = os.environ.get("BENCHMARK_RUNNER") or os.environ.get("RUNNER_NAME", "")
     isCi = bool(os.environ.get("GITHUB_ACTIONS") or os.environ.get("CI"))
 
     if not runner:
@@ -87,6 +88,10 @@ def getRunnerInfo() -> dict[str, Any]:
 
     return {
         "runner": runner,
+        "runnerName": os.environ.get("RUNNER_NAME", platform.node()),
+        "runnerImage": os.environ.get("ImageVersion", ""),
+        "runId": os.environ.get("GITHUB_RUN_ID"),
+        "runAttempt": os.environ.get("GITHUB_RUN_ATTEMPT"),
         "isCi": isCi,
         "os": f"{platform.system()} {platform.release()}",
         "python": platform.python_version(),
@@ -111,8 +116,12 @@ def getSystemInfo() -> dict[str, Any]:
     """Get system information including CPU and RAM."""
 
     try:
+        cpuModel = platform.processor()
+        if os.path.isfile("/proc/cpuinfo"):
+            with open("/proc/cpuinfo", encoding="utf-8") as cpuFile:
+                cpuModel = next((line.split(":", 1)[1].strip() for line in cpuFile if line.startswith("model name")), cpuModel)
         cpuInfo = {
-            "model": platform.processor(),
+            "model": cpuModel,
             "physicalCores": psutil.cpu_count(logical=False),
             "logicalCores": psutil.cpu_count(logical=True),
             "frequencyMHz": psutil.cpu_freq().current
@@ -212,6 +221,8 @@ def runBenchmark(
     """
     print("Getting video information...")
     videoInfo = getVideoInfo(videoPath)
+    with open(videoPath, "rb") as videoFile:
+        videoInfo["sha256"] = hashlib.file_digest(videoFile, "sha256").hexdigest()
 
     decoders: list[Decoder] = [
         Decoder(name="Nelux", decoder=decodeWithCeLux, cooling=coolingPeriod),
@@ -280,6 +291,9 @@ def runBenchmark(
         for r in range(runs):
             try:
                 result = _runDecoderIteration(decoder, videoPath)
+                expectedFrames = videoInfo.get("frameCount", 0)
+                if "error" not in result and expectedFrames and result.get("frameCount") != expectedFrames:
+                    result["error"] = f"Decoded {result.get('frameCount', 0)} of {expectedFrames} expected frames"
             except Exception as runErr:
                 result = {
                     "error": str(runErr),
@@ -302,11 +316,29 @@ def runBenchmark(
 
     print(lightcyan("\nBenchmark completed."))
 
+    packages = {}
+    for package in ("nelux", "torch", "av", "opencv-python", "torchcodec", "decord", "torchaudio", "video-reader-rs", "ffmpegcv", "imageio-ffmpeg", "ffmpeg-python", "deffcode", "numpy"):
+        try:
+            packages[package] = version(package)
+        except PackageNotFoundError:
+            packages[package] = "not installed"
+    decoderPackages = {
+        "Nelux": "nelux", "PyAV": "av", "OpenCV": "opencv-python",
+        "TorchCodec": "torchcodec", "Decord": "decord", "torchaudio": "torchaudio",
+        "VideoReaderRS": "video-reader-rs", "VideoReaderRS YUV420toRGB": "video-reader-rs",
+        "FFMPEGCV (Block)": "ffmpegcv", "FFmpegCV-NoBlock": "ffmpegcv",
+        "Imageio-ffmpeg": "imageio-ffmpeg", "FFmpeg-python": "ffmpeg-python", "Deffcode": "deffcode",
+    }
+    ffmpegVersion = subprocess.check_output(["ffmpeg", "-version"], text=True).splitlines()[0]
+    for name, data in decodingResults.items():
+        data["version"] = packages[decoderPackages[name]] if name in decoderPackages else ffmpegVersion
+
     results = {
         "videoPath": videoPath,
         "videoInfo": videoInfo,
         "systemInfo": systemInfo,
         "runnerInfo": getRunnerInfo(),
+        "environment": {"packages": packages, "ffmpeg": ffmpegVersion},
         "config": {"runs": runs, "warmup": warmup, "coolingPeriod": coolingPeriod},
         "decoders": decodingResults,
     }
@@ -351,125 +383,6 @@ def saveResults(results: dict[str, Any], outputPath: str) -> None:
         json.dump(results, f, indent=4)
 
     print(f"Results saved to {outputPath}")
-
-
-def createPerformanceDiagram(results: dict[str, Any], outputPath: str) -> None:
-    """Create a bar chart of decoder performance and save it to PNG."""
-    try:
-        decoderNames = []
-        fpsValues = []
-
-        for decoderName, data in results["decoders"].items():
-            if "error" not in data and data.get("fps", 0) > 0:
-                decoderNames.append(decoderName)
-                fpsValues.append(data["fps"])
-            elif "error" in data:
-                print(
-                    f"Skipping {decoderName} in diagram due to error: {data['error']}"
-                )
-            else:
-                print(f"Skipping {decoderName} in diagram due to zero FPS.")
-
-        if not decoderNames:
-            print(lightcyan("No valid decoder results to plot."))
-            return
-
-        plt.figure(figsize=(14, 8))
-        bars = plt.bar(
-            decoderNames,
-            fpsValues,
-            width=0.3,
-            color=[
-                "#3498db",
-                "#2ecc71",
-                "#e74c3c",
-                "#f39c12",
-                "#9b59b6",
-                "#1abc9c",
-                "#34495e",
-                "#f1c40f",
-                "#e67e22",
-                "#95a5a6",
-                "#7f8c8d",
-                "#d35400",
-                "#c0392b",
-            ][: len(decoderNames)],
-        )
-
-        for bar in bars:
-            height = bar.get_height()
-            plt.text(
-                bar.get_x() + bar.get_width() / 2.0,
-                height + max(1, height * 0.02),
-                f"{height:.1f} fps",
-                ha="center",
-                va="bottom",
-                fontweight="bold",
-                fontsize=10,
-            )
-
-        plt.xlabel("Decoders", fontsize=12)
-        plt.ylabel("Performance (FPS)", fontsize=12)
-        plt.title("Video Decoders Performance Comparison", fontsize=16)
-        plt.ylim(0, max(fpsValues) * 1.1)
-
-        plt.xticks(rotation=45, ha="right")
-
-        if "systemInfo" in results and "error" not in results["systemInfo"]:
-            systemInfo = results["systemInfo"]
-            cpuInfo = systemInfo.get("cpu", {})
-            ramInfo = systemInfo.get("ram", {})
-            systemText = (
-                f"CPU: {cpuInfo.get('model', 'N/A')} ({cpuInfo.get('logicalCores', '?')} cores)\n"
-                f"RAM: {ramInfo.get('totalGB', '?')} GB total"
-            )
-            plt.figtext(0.02, 0.02, systemText, fontsize=10, va="bottom", ha="left")
-
-        if "videoInfo" in results and "error" not in results["videoInfo"]:
-            videoInfo = results["videoInfo"]
-            videoText = (
-                f"Video: {os.path.basename(results.get('videoPath', 'N/A'))}\n"
-                f"Resolution: {videoInfo.get('width', '?')}x{videoInfo.get('height', '?')}\n"
-                f"Duration: {videoInfo.get('durationSeconds', 0):.1f}s ({videoInfo.get('frameCount', '?')} frames)"
-            )
-            plt.figtext(0.98, 0.98, videoText, fontsize=10, ha="right", va="top")
-
-        plt.grid(axis="y", linestyle="--", alpha=0.7)
-
-        plt.tight_layout(rect=[0.02, 0.05, 0.98, 0.95])
-        plt.savefig(outputPath, dpi=300)
-        print(f"Performance diagram saved to {outputPath}")
-
-    except Exception as e:
-        print(f"Error creating performance diagram: {str(e)}")
-        traceback.print_exc()
-
-
-def generate_frame_count_markdown(results: dict[str, Any], outputPath: str) -> None:
-    """Generate a markdown table comparing frame counts to OpenCV and save it."""
-    decoders = results.get("decoders", {})
-    opencv_count = None
-    if "OpenCV" in decoders and "frameCount" in decoders["OpenCV"]:
-        opencv_count = decoders["OpenCV"]["frameCount"]
-    else:
-        opencv_count = None
-
-    lines = []
-    lines.append("| Decoder | Frames Decoded | Matches OpenCV? |")
-    lines.append("|---------|----------------|-----------------|")
-
-    for decoder, data in decoders.items():
-        frame_count = data.get("frameCount", "N/A")
-        if opencv_count is not None and isinstance(frame_count, int):
-            match = "✅" if frame_count == opencv_count else "❌"
-        else:
-            match = "N/A"
-        lines.append(f"| {decoder} | {frame_count} | {match} |")
-
-    markdown = "\n".join(lines)
-    with open(outputPath, "w", encoding="utf-8") as f:
-        f.write(markdown)
-    print(f"Frame count comparison markdown saved to {outputPath}")
 
 
 def printResultsSummary(results: dict[str, Any]) -> None:
@@ -614,6 +527,8 @@ def main() -> None:
     )
 
     arguments = parser.parse_args()
+    if arguments.runs < 1 or arguments.warmup < 0 or arguments.cooling < 0:
+        parser.error("runs must be positive; warmup and cooling must be nonnegative")
 
     # Originals (commondatastorage.googleapis.com / gtv-videos-bucket) started
     # returning HTTP 403 in early 2026 regardless of User-Agent — the bucket is
